@@ -1,0 +1,67 @@
+[
+    {
+        "id": "1",
+        "username": "jdoe",
+        "profilePicture": "profile_picture_3.webp"
+    },
+    {
+        "id": "2",
+        "username": "asmith",
+        "profilePicture": "profile_picture_1.webp"
+    },
+    {
+        "id": "3",
+        "username": "bwilson",
+        "profilePicture": "profile_picture_5.webp"
+    },
+    {
+        "id": "4",
+        "username": "cgarcia",
+        "profilePicture": "profile_picture_2.webp"
+    },
+    {
+        "id": "5",
+        "username": "dlee",
+        "profilePicture": "profile_picture_4.webp"
+    },
+    {
+        "id": "6",
+        "username": "emartinez",
+        "profilePicture": "profile_picture_1.webp"
+    },
+    {
+        "id": "7",
+        "username": "fchen",
+        "profilePicture": "profile_picture_3.webp"
+    },
+    {
+        "id": "8",
+        "username": "gkumar",
+        "profilePicture": "profile_picture_5.webp"
+    },
+    {
+        "id": "9",
+        "username": "hpatel",
+        "profilePicture": "profile_picture_2.webp"
+    },
+    {
+        "id": "10",
+        "username": "ijohnson",
+        "profilePicture": "profile_picture_4.webp"
+    },
+    {
+        "id": "11",
+        "username": "jnguyen",
+        "profilePicture": "profile_picture_1.webp"
+    },
+    {
+        "id": "12",
+        "username": "kroberts",
+        "profilePicture": "profile_picture_3.webp"
+    },
+    {
+        "id": "13",
+        "username": "ltaylor",
+        "profilePicture": "profile_picture_2.webp"
+    }
+]

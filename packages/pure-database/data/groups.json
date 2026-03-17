@@ -1,0 +1,23 @@
+[
+    {
+        "id": "1",
+        "name": "Pure Poker",
+        "memberCount": 2010,
+        "backgroundColor": "black",
+        "icon": "PP_icon.webp"
+    },
+    {
+        "id": "2",
+        "name": "Columbia Club",
+        "memberCount": 12,
+        "backgroundColor": "blue",
+        "icon": "CC_icon.webp"
+    },
+    {
+        "id": "3",
+        "name": "NYU",
+        "memberCount": 251,
+        "backgroundColor": "limegreen",
+        "icon": "NY_icon.webp"
+    }
+]

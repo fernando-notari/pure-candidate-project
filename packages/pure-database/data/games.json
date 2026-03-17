@@ -1,0 +1,29 @@
+[
+    {
+        "id": "1",
+        "gamemode": "NLH",
+        "bigBlind": 100,
+        "seats": 6,
+        "seatsAvailable": 3,
+        "groupId": "2",
+        "players": [1, 2, 3]
+    },
+    {
+        "id": "2",
+        "gamemode": "PLO4",
+        "bigBlind": 200,
+        "seats": 9,
+        "seatsAvailable": 4,
+        "groupId": "2",
+        "players": [4, 5, 6, 7, 8]
+    },
+    {
+        "id": "3",
+        "gamemode": "NLH",
+        "bigBlind": 100,
+        "seats": 3,
+        "seatsAvailable": 3,
+        "groupId": "2",
+        "players": [9, 10, 11]
+    }
+]

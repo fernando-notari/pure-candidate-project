@@ -1,22 +1,20 @@
 {
-  "name": "pure-candidate-assignment",
-  "version": "1.0.0",
-  "main": "index.ts",
-  "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
-  },
-  "dependencies": {
-    "expo": "~55.0.6",
-    "expo-status-bar": "~55.0.4",
-    "react": "19.2.0",
-    "react-native": "0.83.2"
-  },
-  "devDependencies": {
-    "@types/react": "~19.2.2",
-    "typescript": "~5.9.2"
-  },
-  "private": true
+    "name": "pure-candidate-assignment",
+    "version": "1.0.0",
+    "private": true,
+    "workspaces": ["apps/*", "packages/*"],
+    "scripts": {
+        "dev:backend": "npm run dev --workspace=pure-backend",
+        "dev:mobile": "npm run start --workspace=mobile",
+        "format": "biome format --write .",
+        "lint": "biome lint --write .",
+        "check": "biome check --write ."
+    },
+    "overrides": {
+        "react": "19.1.0",
+        "react-native": "0.81.5"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "^1.9.4"
+    }
 }
