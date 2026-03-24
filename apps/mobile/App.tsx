@@ -1,5 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { FlatList, StyleSheet, Text, View } from "react-native";
+import { BottomTabBar } from "./src/components/bottom-tab-bar";
 import { theme } from "./src/theme";
 import { TRPCProvider, api } from "./src/trpc";
 
@@ -32,8 +33,11 @@ export default function App() {
     return (
         <TRPCProvider>
             <View style={styles.container}>
-                <Text style={styles.title}>Users</Text>
-                <UserList />
+                <View style={styles.content}>
+                    <Text style={styles.title}>Users</Text>
+                    <UserList />
+                </View>
+                <BottomTabBar />
                 <StatusBar style="light" />
             </View>
         </TRPCProvider>
@@ -44,6 +48,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: theme.colors.background,
+    },
+    content: {
+        flex: 1,
         paddingTop: 80,
         paddingHorizontal: 20,
     },
