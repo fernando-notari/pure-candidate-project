@@ -9,33 +9,37 @@ import SuperJSON from "superjson";
 export const api = createTRPCReact<AppRouter>();
 
 function getBaseUrl(): string {
-    const hostUri = Constants.expoConfig?.hostUri;
-    if (hostUri) {
-        const host = hostUri.split(":")[0];
-        return `http://${host}:3141`;
-    }
-    return "http://localhost:3141";
+  const hostUri = Constants.expoConfig?.hostUri;
+  if (hostUri) {
+    const host = hostUri.split(":")[0];
+    return `http://${host}:3141`;
+  }
+
+  const backendHost = process.env.EXPO_PUBLIC_BACKEND_HOST;
+  if (backendHost) {
+    return `http://${backendHost}:3141`;
+  }
+
+  return "http://localhost:3141";
 }
 
 const queryClient = new QueryClient();
 
 export function TRPCProvider({ children }: { children: React.ReactNode }) {
-    const [trpcClient] = useState(() =>
-        api.createClient({
-            links: [
-                httpBatchLink({
-                    url: `${getBaseUrl()}/trpc`,
-                    transformer: SuperJSON,
-                }),
-            ],
+  const [trpcClient] = useState(() =>
+    api.createClient({
+      links: [
+        httpBatchLink({
+          url: `${getBaseUrl()}/trpc`,
+          transformer: SuperJSON,
         }),
-    );
+      ],
+    }),
+  );
 
-    return (
-        <api.Provider client={trpcClient} queryClient={queryClient}>
-            <QueryClientProvider client={queryClient}>
-                {children}
-            </QueryClientProvider>
-        </api.Provider>
-    );
+  return (
+    <api.Provider client={trpcClient} queryClient={queryClient}>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    </api.Provider>
+  );
 }
