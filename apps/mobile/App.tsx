@@ -1,31 +1,43 @@
 import { StatusBar } from "expo-status-bar";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { BottomTabBar } from "./src/components/bottom-tab-bar";
+import { HomepageSection } from "./src/components/homepage-section";
 import { theme } from "./src/theme";
-import { TRPCProvider, api } from "./src/trpc";
+import { TRPCProvider } from "./src/trpc";
 
-function UserList() {
-    const { data: users, isLoading, error } = api.user.getAll.useQuery();
-
-    if (isLoading) {
-        return <Text style={styles.message}>Loading users...</Text>;
-    }
-
-    if (error) {
-        return <Text style={styles.message}>Error: {error.message}</Text>;
-    }
-
+function ActiveGamesSkeleton() {
     return (
-        <FlatList
-            data={users}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-                <View style={styles.userRow}>
-                    <Text style={styles.username}>@{item.username}</Text>
-                    <Text style={styles.name}>{item.profilePicture}</Text>
+        <View style={styles.skeletonRow}>
+            <View style={[styles.skeleton, { width: 200, height: 120, borderRadius: 16 }]} />
+            <View style={[styles.skeleton, { width: 200, height: 120, borderRadius: 16 }]} />
+        </View>
+    );
+}
+
+function FriendsSkeleton() {
+    return (
+        <View style={styles.skeletonRow}>
+            {[1, 2, 3, 4].map((i) => (
+                <View key={i} style={styles.skeletonCircleGroup}>
+                    <View style={[styles.skeleton, { width: 64, height: 64, borderRadius: 32 }]} />
+                    <View style={[styles.skeleton, { width: 56, height: 12, borderRadius: 6 }]} />
                 </View>
-            )}
-        />
+            ))}
+        </View>
+    );
+}
+
+function GroupsSkeleton() {
+    return (
+        <View style={styles.skeletonRow}>
+            {[1, 2, 3].map((i) => (
+                <View key={i} style={styles.skeletonCardGroup}>
+                    <View style={[styles.skeleton, { width: 120, height: 120, borderRadius: 16 }]} />
+                    <View style={[styles.skeleton, { width: 96, height: 12, borderRadius: 6 }]} />
+                    <View style={[styles.skeleton, { width: 72, height: 10, borderRadius: 5 }]} />
+                </View>
+            ))}
+        </View>
     );
 }
 
@@ -33,10 +45,17 @@ export default function App() {
     return (
         <TRPCProvider>
             <View style={styles.container}>
-                <View style={styles.content}>
-                    <Text style={styles.title}>Users</Text>
-                    <UserList />
-                </View>
+                <ScrollView style={styles.content} contentContainerStyle={styles.sections}>
+                    <HomepageSection title="Active Games" route="/active-games">
+                        <ActiveGamesSkeleton />
+                    </HomepageSection>
+                    <HomepageSection title="Friends" route="/friends">
+                        <FriendsSkeleton />
+                    </HomepageSection>
+                    <HomepageSection title="Groups" route="/groups">
+                        <GroupsSkeleton />
+                    </HomepageSection>
+                </ScrollView>
                 <BottomTabBar />
                 <StatusBar style="light" />
             </View>
@@ -54,30 +73,22 @@ const styles = StyleSheet.create({
         paddingTop: 80,
         paddingHorizontal: 20,
     },
-    title: {
-        fontSize: 28,
-        fontWeight: "bold",
-        marginBottom: 20,
-        color: theme.colors.foreground,
+    sections: {
+        gap: 32,
+        paddingBottom: 24,
     },
-    message: {
-        fontSize: 16,
-        color: theme.colors.muted,
-    },
-    userRow: {
+    skeletonRow: {
         flexDirection: "row",
-        justifyContent: "space-between",
-        paddingVertical: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: theme.colors.muted,
+        gap: 12,
     },
-    username: {
-        fontSize: 16,
-        fontWeight: "600",
-        color: theme.colors.foreground,
+    skeletonCircleGroup: {
+        alignItems: "center",
+        gap: 8,
     },
-    name: {
-        fontSize: 16,
-        color: theme.colors.muted,
+    skeletonCardGroup: {
+        gap: 8,
+    },
+    skeleton: {
+        backgroundColor: "#1C1C1E",
     },
 });
