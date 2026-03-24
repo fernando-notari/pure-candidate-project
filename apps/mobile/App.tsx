@@ -1,5 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { FlatList, StyleSheet, Text, View } from "react-native";
+import { theme } from "./src/theme";
 import { TRPCProvider, api } from "./src/trpc";
 
 function UserList() {
@@ -33,7 +34,7 @@ export default function App() {
             <View style={styles.container}>
                 <Text style={styles.title}>Users</Text>
                 <UserList />
-                <StatusBar style="auto" />
+                <StatusBar style="light" />
             </View>
         </TRPCProvider>
     );
@@ -42,7 +43,7 @@ export default function App() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: theme.colors.background,
         paddingTop: 80,
         paddingHorizontal: 20,
     },
@@ -50,24 +51,26 @@ const styles = StyleSheet.create({
         fontSize: 28,
         fontWeight: "bold",
         marginBottom: 20,
+        color: theme.colors.foreground,
     },
     message: {
         fontSize: 16,
-        color: "#666",
+        color: theme.colors.muted,
     },
     userRow: {
         flexDirection: "row",
         justifyContent: "space-between",
         paddingVertical: 12,
         borderBottomWidth: 1,
-        borderBottomColor: "#eee",
+        borderBottomColor: theme.colors.muted,
     },
     username: {
         fontSize: 16,
         fontWeight: "600",
+        color: theme.colors.foreground,
     },
     name: {
         fontSize: 16,
-        color: "#666",
+        color: theme.colors.muted,
     },
 });
