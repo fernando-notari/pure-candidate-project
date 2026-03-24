@@ -2,7 +2,10 @@
     "name": "pure-candidate-assignment",
     "version": "1.0.0",
     "private": true,
-    "workspaces": ["apps/*", "packages/*"],
+    "workspaces": [
+        "apps/*",
+        "packages/*"
+    ],
     "scripts": {
         "dev:backend": "npm run dev --workspace=pure-backend",
         "dev:mobile": "npm run start --workspace=mobile",
