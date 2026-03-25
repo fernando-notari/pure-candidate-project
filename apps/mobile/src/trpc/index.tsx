@@ -1,27 +1,12 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createTRPCReact, httpBatchLink } from "@trpc/react-query";
-import Constants from "expo-constants";
 import type { AppRouter } from "pure-backend";
 import type React from "react";
 import { useState } from "react";
 import SuperJSON from "superjson";
+import { getBaseUrl } from "../utils/base-url";
 
 export const api = createTRPCReact<AppRouter>();
-
-function getBaseUrl(): string {
-  const hostUri = Constants.expoConfig?.hostUri;
-  if (hostUri) {
-    const host = hostUri.split(":")[0];
-    return `http://${host}:3141`;
-  }
-
-  const backendHost = process.env.EXPO_PUBLIC_BACKEND_HOST;
-  if (backendHost) {
-    return `http://${backendHost}:3141`;
-  }
-
-  return "http://localhost:3141";
-}
 
 const queryClient = new QueryClient();
 
