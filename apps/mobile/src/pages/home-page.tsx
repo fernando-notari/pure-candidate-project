@@ -1,7 +1,7 @@
 import { ScrollView, StyleSheet, View } from "react-native";
 import { FriendsSection } from "../components/friends-section";
+import { GroupsSection } from "../components/groups-section";
 import { HomepageSection } from "../components/homepage-section";
-import { theme } from "../theme";
 
 const CURRENT_USER_ID = "1";
 
@@ -14,35 +14,6 @@ function ActiveGamesSkeleton() {
       <View
         style={[styles.skeleton, { width: 200, height: 120, borderRadius: 16 }]}
       />
-    </View>
-  );
-}
-
-function GroupsSkeleton() {
-  return (
-    <View style={styles.skeletonRow}>
-      {[1, 2, 3].map((i) => (
-        <View key={i} style={styles.skeletonCardGroup}>
-          <View
-            style={[
-              styles.skeleton,
-              { width: 120, height: 120, borderRadius: 16 },
-            ]}
-          />
-          <View
-            style={[
-              styles.skeleton,
-              { width: 96, height: 12, borderRadius: 6 },
-            ]}
-          />
-          <View
-            style={[
-              styles.skeleton,
-              { width: 72, height: 10, borderRadius: 5 },
-            ]}
-          />
-        </View>
-      ))}
     </View>
   );
 }
@@ -60,7 +31,7 @@ export function HomePage() {
         <FriendsSection userId={CURRENT_USER_ID} />
       </HomepageSection>
       <HomepageSection title="Groups" route="/groups">
-        <GroupsSkeleton />
+        <GroupsSection />
       </HomepageSection>
     </ScrollView>
   );
@@ -79,9 +50,6 @@ const styles = StyleSheet.create({
   skeletonRow: {
     flexDirection: "row",
     gap: 12,
-  },
-  skeletonCardGroup: {
-    gap: 8,
   },
   skeleton: {
     backgroundColor: "#1C1C1E",
