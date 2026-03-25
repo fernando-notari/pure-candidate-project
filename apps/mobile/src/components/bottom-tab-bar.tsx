@@ -6,20 +6,27 @@ import {
 import { theme } from "../theme";
 import { BellIcon, GlobeIcon, HomeIcon, PeopleIcon, PlusIcon } from "./icons";
 
+export type TabName = "Home" | "Groups" | "Notifications" | "Friends";
+
 type TabItem = {
-  label: string;
-  icon: React.ReactNode;
+  label: TabName | "";
+  icon: (active: boolean) => React.ReactNode;
 };
 
 const tabs: TabItem[] = [
-  { label: "Home", icon: <HomeIcon size={24} /> },
-  { label: "Groups", icon: <GlobeIcon size={24} /> },
-  { label: "", icon: <PlusIcon size={20} /> },
-  { label: "Notifications", icon: <BellIcon size={24} /> },
-  { label: "Friends", icon: <PeopleIcon size={24} /> },
+  { label: "Home", icon: (active) => <HomeIcon size={24} color={active ? theme.colors.foreground : undefined} /> },
+  { label: "Groups", icon: (active) => <GlobeIcon size={24} color={active ? theme.colors.foreground : undefined} /> },
+  { label: "", icon: () => <PlusIcon size={20} /> },
+  { label: "Notifications", icon: (active) => <BellIcon size={24} color={active ? theme.colors.foreground : undefined} /> },
+  { label: "Friends", icon: (active) => <PeopleIcon size={24} color={active ? theme.colors.foreground : undefined} /> },
 ];
 
-export function BottomTabBar() {
+type BottomTabBarProps = {
+  activeTab: TabName;
+  onTabChange: (tab: TabName) => void;
+};
+
+export function BottomTabBar({ activeTab, onTabChange }: BottomTabBarProps) {
   return (
     <LiquidGlassContainerView style={styles.container}>
       <View style={styles.divider} />
@@ -31,16 +38,24 @@ export function BottomTabBar() {
             return (
               <TouchableOpacity key="center" style={styles.centerWrapper}>
                 <LiquidGlassView style={styles.centerButton}>
-                  {tab.icon}
+                  {tab.icon(false)}
                 </LiquidGlassView>
               </TouchableOpacity>
             );
           }
 
+          const isActive = tab.label === activeTab;
+
           return (
-            <TouchableOpacity key={tab.label} style={styles.tab}>
-              {tab.icon}
-              <Text style={styles.label}>{tab.label}</Text>
+            <TouchableOpacity
+              key={tab.label}
+              style={styles.tab}
+              onPress={() => onTabChange(tab.label as TabName)}
+            >
+              {tab.icon(isActive)}
+              <Text style={[styles.label, isActive && styles.labelActive]}>
+                {tab.label}
+              </Text>
             </TouchableOpacity>
           );
         })}
@@ -76,6 +91,9 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: theme.colors.muted,
     marginTop: 2,
+  },
+  labelActive: {
+    color: theme.colors.foreground,
   },
   centerWrapper: {
     alignItems: "center",
