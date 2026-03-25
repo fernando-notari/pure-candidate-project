@@ -28,7 +28,7 @@ export function HomepageSection({ title, route, children }: HomepageSectionProps
 
 const styles = StyleSheet.create({
     container: {
-        gap: 16,
+        gap: 23,
     },
     header: {
         flexDirection: "row",
