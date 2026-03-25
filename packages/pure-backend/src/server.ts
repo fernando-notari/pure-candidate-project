@@ -1,13 +1,18 @@
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import cors from "cors";
 import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
 import { appRouter } from "./root";
 import { createTRPCContext } from "./trpc";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const PORT = 3141;
 
 app.use(cors());
+app.use("/public", express.static(path.join(__dirname, "../public")));
 
 app.use(
     "/trpc",
