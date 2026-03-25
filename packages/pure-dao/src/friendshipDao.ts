@@ -12,4 +12,11 @@ export class FriendshipDAO extends BaseDAO<Friendship> {
     async getAll(): Promise<Friendship[]> {
         return this.getStore();
     }
+
+    async getByUserId(userId: string): Promise<Friendship[]> {
+        const store = await this.getStore();
+        return store.filter(
+            (f) => f.userIdLow === userId || f.userIdHigh === userId,
+        );
+    }
 }
