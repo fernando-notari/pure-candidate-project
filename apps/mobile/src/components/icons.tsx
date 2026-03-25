@@ -1,4 +1,4 @@
-import Svg, { Path, Mask, Rect } from "react-native-svg";
+import Svg, { Path, Mask, Rect, G } from "react-native-svg";
 
 type IconProps = {
 	size?: number;
@@ -78,6 +78,70 @@ export function ChevronRightIcon({ size = 24, color = "#FFFFFF" }: IconProps) {
 				strokeLinecap="round"
 				strokeLinejoin="round"
 			/>
+		</Svg>
+	);
+}
+
+export function UserIcon({ size = 24, color = "#8E8E93" }: IconProps) {
+	return (
+		<Svg width={size} height={size} viewBox="0 0 15 15" fill="none">
+			<Path
+				d="M7.2053 7.6576C7.15805 7.65085 7.09731 7.65085 7.04332 7.6576C5.8555 7.61711 4.91064 6.64538 4.91064 5.45094C4.91064 4.22952 5.89599 3.23755 7.12431 3.23755C8.34587 3.23755 9.33798 4.22952 9.33798 5.45094C9.33123 6.64538 8.39312 7.61711 7.2053 7.6576Z"
+				stroke={color}
+				strokeWidth={0.75}
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<Path
+				d="M11.6724 12.107C10.4711 13.2069 8.87835 13.875 7.12361 13.875C5.36885 13.875 3.77609 13.2069 2.57477 12.107C2.64226 11.4726 3.0472 10.8518 3.76934 10.3659C5.61856 9.13778 8.64213 9.13778 10.4779 10.3659C11.2 10.8518 11.6049 11.4726 11.6724 12.107Z"
+				stroke={color}
+				strokeWidth={0.75}
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<Path
+				d="M7.12399 13.8713C10.8513 13.8713 13.873 10.85 13.873 7.12313C13.873 3.39624 10.8513 0.375 7.12399 0.375C3.39663 0.375 0.375 3.39624 0.375 7.12313C0.375 10.85 3.39663 13.8713 7.12399 13.8713Z"
+				stroke={color}
+				strokeWidth={0.75}
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</Svg>
+	);
+}
+
+export function WalletIcon({ size = 24, color = "#8E8E93" }: IconProps) {
+	return (
+		<Svg width={size} height={size} viewBox="0 0 20 23" fill="none">
+			<Mask id="walletMask" maskUnits="userSpaceOnUse" x="0" y="0" width="20" height="23">
+				<Path d="M19.6301 0H0V22.6533H19.6301V0Z" fill="white" />
+			</Mask>
+			<G mask="url(#walletMask)">
+				<Path
+					d="M15.0055 11.0601C14.7266 11.3324 14.5672 11.7242 14.607 12.1426C14.6668 12.8599 15.3243 13.3845 16.0415 13.3845H17.3034V14.1748C17.3034 15.5496 16.181 16.672 14.8062 16.672H7.18206C5.80731 16.672 4.68494 15.5496 4.68494 14.1748V9.70526C4.68494 8.33052 5.80731 7.20813 7.18206 7.20813H14.8062C16.181 7.20813 17.3034 8.33052 17.3034 9.70526V10.6616H15.9618C15.5899 10.6616 15.2512 10.8077 15.0055 11.0601Z"
+					stroke={color}
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+				<Path
+					d="M4.68494 10.3032V7.26813C4.68494 6.47781 5.16975 5.7738 5.90693 5.49487L11.1801 3.50248C12.0036 3.19034 12.8869 3.80136 12.8869 4.68465V7.20834"
+					stroke={color}
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+				<Path
+					d="M18.0066 11.3392V12.7073C18.0066 13.0726 17.7143 13.3715 17.3424 13.3847H16.0407C15.3235 13.3847 14.666 12.8601 14.6062 12.1428C14.5664 11.7244 14.7258 11.3326 15.0047 11.0603C15.2504 10.8079 15.5891 10.6618 15.961 10.6618H17.3424C17.7143 10.6751 18.0066 10.9739 18.0066 11.3392Z"
+					stroke={color}
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+				<Path
+					d="M7.67352 10.0307H12.3224"
+					stroke={color}
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</G>
 		</Svg>
 	);
 }
