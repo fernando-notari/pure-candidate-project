@@ -1,6 +1,7 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useCallback, useState } from "react";
-import { Dimensions, StyleSheet, View } from "react-native";
+import { Dimensions, RefreshControl, StyleSheet, View } from "react-native";
+import { useQueryClient } from "@tanstack/react-query";
 import Animated, { interpolate, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { ActiveGamesSection } from "../components/active-games-section/active-games-section";
 import type { ActionChipData } from "../components/recommendation-page/action-chips-ticker";
@@ -12,6 +13,7 @@ import { GameRecommendation } from "../components/recommendation-page/game-recom
 import { GroupsSection } from "../components/groups-section";
 import { HomeCarousel } from "../components/home/carousel";
 import { HomeHeader } from "../components/home/header";
+import { RefreshIndicator } from "../components/home/refresh-indicator";
 import { HomeSection } from "../components/home/section";
 import { api } from "../trpc";
 import { getProfilePicture } from "../utils/profile-pictures";
@@ -39,8 +41,10 @@ const MOCK_ACTIONS: ActionChipData[] = [
 
 export function HomePage() {
   const [activeFilter, setActiveFilter] = useState<GameFilter | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
   const scrollY = useSharedValue(0);
   const carouselScrollX = useSharedValue(0);
+  const queryClient = useQueryClient();
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
@@ -58,6 +62,12 @@ export function HomePage() {
   const handleFilterChange = useCallback((filter: GameFilter | null) => {
     setActiveFilter(filter);
   }, []);
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await queryClient.invalidateQueries();
+    setRefreshing(false);
+  }, [queryClient]);
 
   const gamemodeFilters = activeFilter ? new Set([activeFilter]) : new Set<GameFilter>();
 
@@ -89,6 +99,13 @@ export function HomePage() {
         contentContainerStyle={styles.scrollContent}
         onScroll={scrollHandler}
         scrollEventThrottle={16}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor="transparent"
+          />
+        }
       >
         <HomeCarousel scrollX={carouselScrollX}>
           {[
@@ -129,6 +146,7 @@ export function HomePage() {
           </HomeSection>
         </View>
       </Animated.ScrollView>
+      <RefreshIndicator scrollY={scrollY} refreshing={refreshing} />
       <HomeHeader
         profilePicture={currentUser?.profilePicture ?? ""}
         // TODO: No endpoint for user balance yet, using placeholder
