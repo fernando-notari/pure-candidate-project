@@ -13,49 +13,55 @@ import Svg, {
   Defs,
   LinearGradient as SvgLinearGradient,
   Stop,
-  Text as SvgText,
 } from "react-native-svg";
 import { theme } from "../theme";
 import { api } from "../trpc";
-import { UserIcon } from "./icons";
+import {
+  getGroupInitials,
+  groupCardColors,
+  defaultGroupColors,
+} from "../utils/groups";
 
-const aceOfSpades = require("../../assets/playing-cards/a-spade.png");
-const aceOfHearts = require("../../assets/playing-cards/a-heart.png");
-const aceOfClover = require("../../assets/playing-cards/a-clover.png");
-const kingOfSpades = require("../../assets/playing-cards/k-spade.png");
-const queenOfHearts = require("../../assets/playing-cards/q-heart.png");
-const jackOfDiamonds = require("../../assets/playing-cards/j-diamond.png");
+import aceOfSpades from "../../assets/playing-cards/a-spade.png";
+import aceOfHearts from "../../assets/playing-cards/a-heart.png";
+import aceOfClover from "../../assets/playing-cards/a-clover.png";
+import kingOfSpades from "../../assets/playing-cards/k-spade.png";
+import queenOfHearts from "../../assets/playing-cards/q-heart.png";
+import jackOfDiamonds from "../../assets/playing-cards/j-diamond.png";
 
 const CURRENT_USER_ID = "1";
 
 type CardColors = [string, string];
 
-const gameCardColors: Record<string, CardColors> = {
-  blue: ["#0A0A0A", "#253358"],
-  black: ["#0F1421", "#6F282ADB"],
-  limegreen: ["#3A5E42", "#1A2E1F"],
-};
-
-const gameModeColors: Record<string, CardColors> = {
-  PLO4: ["#0A0A0A", "#6F282ADB"],
-};
-
-const defaultCardColors: CardColors = ["#383838", "#111111"];
-
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((word) => word[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
+function darkenColor(hex: string, factor: number): string {
+  const raw = hex.replace("#", "").slice(0, 6);
+  const r = Math.round(parseInt(raw.slice(0, 2), 16) * factor);
+  const g = Math.round(parseInt(raw.slice(2, 4), 16) * factor);
+  const b = Math.round(parseInt(raw.slice(4, 6), 16) * factor);
+  return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
 }
 
-function formatStakes(bigBlind: number): string {
+const gameAccentColors: Record<string, string> = {
+  NLH: "#253358",
+  PLO4: "#6F282A",
+  SNG: "#1A2E1F",
+};
+
+const DARKEN_FACTOR = 0.3;
+
+function getCardColors(gamemode: string): CardColors {
+  const accent = gameAccentColors[gamemode] ?? "#282828";
+  return [darkenColor(accent, DARKEN_FACTOR), accent];
+}
+
+function formatBlind(value: number): string {
+  return value % 1 === 0 ? `$${value}` : `$${value.toFixed(2)}`;
+}
+
+function getStakes(bigBlind: number) {
   const bb = bigBlind / 100;
   const sb = bb / 2;
-  const fmt = (v: number) => (v % 1 === 0 ? `$${v}` : `$${v.toFixed(2)}`);
-  return `${fmt(sb)}/${fmt(bb)}`;
+  return { sb: formatBlind(sb), bb: formatBlind(bb) };
 }
 
 type SeatIndicatorProps = {
@@ -71,7 +77,12 @@ const RING_INSET = 4;
 const RING_RADIUS = RING_SIZE / 2 - RING_INSET - RING_STROKE / 2;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 
-function SeatIndicator({ filledSeats, totalSeats, progressColor = "#007CFF", bgColors = ["#0A0A0A", "#253358"] }: SeatIndicatorProps) {
+function SeatIndicator({
+  filledSeats,
+  totalSeats,
+  progressColor = "#007CFF",
+  bgColors = ["#0A0A0A", "#253358"],
+}: SeatIndicatorProps) {
   const progress = filledSeats / totalSeats;
   const dashOffset = RING_CIRCUMFERENCE * (1 - progress);
 
@@ -269,7 +280,9 @@ type ActiveGamesSectionProps = {
   gamemodeFilters?: Set<string>;
 };
 
-export function ActiveGamesSection({ gamemodeFilters }: ActiveGamesSectionProps) {
+export function ActiveGamesSection({
+  gamemodeFilters,
+}: ActiveGamesSectionProps) {
   const {
     data: games,
     isLoading: gamesLoading,
@@ -340,9 +353,7 @@ export function ActiveGamesSection({ gamemodeFilters }: ActiveGamesSectionProps)
       {filteredGames.map((game) => {
         const group = groupMap[game.groupId];
         const colors =
-          gameModeColors[game.gamemode] ??
-          gameCardColors[group?.backgroundColor ?? ""] ??
-          defaultCardColors;
+          getCardColors(game.gamemode);
         const filledSeats = game.seats - game.seatsAvailable;
         const friendsInGame = game.players.filter((playerId) =>
           friendIds.has(String(playerId)),
@@ -358,50 +369,60 @@ export function ActiveGamesSection({ gamemodeFilters }: ActiveGamesSectionProps)
             >
               <View style={styles.cardColumns}>
                 <View style={styles.cardLeft}>
-                  <View style={styles.cardContent}>
+                  <View style={styles.gameInfo}>
                     <Text style={styles.gameMode}>{game.gamemode}</Text>
                     <Text style={styles.stakes}>
-                      {formatStakes(game.bigBlind)}
+                      {getStakes(game.bigBlind).sb}
+                      <Text style={styles.stakesSlash}>  /  </Text>
+                      {getStakes(game.bigBlind).bb}
                     </Text>
                   </View>
                   <View style={styles.cardFooter}>
                     {group && (
-                      <View style={styles.badge}>
-                        <View
-                          style={[
-                            styles.groupCircle,
-                            {
-                              backgroundColor:
-                                gameCardColors[group.backgroundColor]?.[0] ??
-                                "#444",
-                            },
-                          ]}
+                      <View style={styles.footerRow}>
+                        <LinearGradient
+                          colors={
+                            (groupCardColors[group.backgroundColor] ?? defaultGroupColors).circle
+                          }
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 1 }}
+                          style={styles.groupIcon}
                         >
-                          <Text style={styles.groupInitials}>
-                            {getInitials(group.name)}
+                          <Text style={[styles.groupIconInitials, { color: (groupCardColors[group.backgroundColor] ?? defaultGroupColors).initialsColor }]}>
+                            {getGroupInitials(group.name)}
                           </Text>
-                        </View>
-                        <Text style={styles.groupName} numberOfLines={1}>
+                        </LinearGradient>
+                        <Text style={styles.footerLabel} numberOfLines={1}>
                           {group.name}
                         </Text>
                       </View>
                     )}
-                    <View style={styles.badge}>
-                      <View style={styles.friendsIconContainer}>
-                        <UserIcon size={17} color={theme.colors.foreground} />
+                    {friendsInGame > 0 && (
+                      <View style={styles.footerRow}>
+                        <View style={styles.friendsCircle}>
+                          <Text style={styles.friendsCircleText}>
+                            {friendsInGame}
+                          </Text>
+                        </View>
+                        <Text style={styles.footerLabel}>
+                          {friendsInGame === 1 ? "friend" : "friends"} playing
+                        </Text>
                       </View>
-                      <Text style={styles.friendsText}>
-                        {friendsInGame} Friends
-                      </Text>
-                    </View>
+                    )}
                   </View>
                 </View>
                 <View style={styles.seatIndicator}>
                   <SeatIndicator
                     filledSeats={filledSeats}
                     totalSeats={game.seats}
-                    progressColor={game.gamemode === "PLO4" ? "#CC3333" : "#007CFF"}
-                    bgColors={game.gamemode === "PLO4" ? ["#0A0A0A", "#6F282ADB"] : undefined}
+                    progressColor={
+                      game.gamemode === "PLO4" ? "#CC3333" : "#007CFF"
+                    }
+                    bgColors={
+                      game.gamemode === "PLO4"
+                        ? ["#0A0A0A", "#6F282ADB"]
+                        : undefined
+                    }
                   />
                 </View>
               </View>
@@ -432,76 +453,75 @@ const styles = StyleSheet.create({
   },
   cardColumns: {
     flexDirection: "row",
-    gap: 24,
+    gap: 38,
   },
   cardLeft: {
     flex: 1,
     justifyContent: "space-between",
-    gap: 15,
+    gap: 24,
   },
   seatIndicator: {
     justifyContent: "center",
     alignItems: "center",
     marginTop: -25,
   },
-  cardContent: {
+  gameInfo: {
     gap: 2,
   },
   gameMode: {
-    fontSize: 27,
-    fontWeight: "700",
-    letterSpacing: 0.36,
+    fontSize: 28,
+    fontWeight: "800",
+    letterSpacing: 1.2,
     color: "#FFFFFF",
+    textTransform: "uppercase",
   },
   stakes: {
     fontSize: 17,
-    fontWeight: "500",
-    color: "#FFFFFFBF",
+    fontWeight: "600",
+    letterSpacing: -0.3,
+    color: "#ADADAD",
+  },
+  stakesSlash: {
+    color: "rgba(255, 255, 255, 0.25)",
+    fontWeight: "400",
   },
   cardFooter: {
-    gap: 5,
+    gap: 6,
   },
-  badge: {
+  footerRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: "#00000033",
-    paddingLeft: 7,
-    paddingRight: 9,
-    height: 32,
-    borderRadius: 20,
-    alignSelf: "flex-start",
   },
-  groupCircle: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+  groupIcon: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
     alignItems: "center",
     justifyContent: "center",
   },
-  friendsIconContainer: {
-    width: 20,
-    height: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  groupInitials: {
+  groupIconInitials: {
     fontSize: 8,
     fontWeight: "600",
-    color: "rgba(255, 255, 255, 0.8)",
   },
-  groupName: {
-    fontSize: 12,
+  friendsCircle: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  friendsCircleText: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: "rgba(255, 255, 255, 0.6)",
+  },
+  footerLabel: {
+    fontSize: 13,
     fontWeight: "500",
-    letterSpacing: -0.12,
-    color: theme.colors.foreground,
+    color: "rgba(255, 255, 255, 0.5)",
     flexShrink: 1,
-  },
-  friendsText: {
-    fontSize: 12,
-    fontWeight: "500",
-    letterSpacing: -0.12,
-    color: theme.colors.foreground,
   },
   skeletonCard: {
     width: 200,
