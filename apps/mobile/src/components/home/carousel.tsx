@@ -14,7 +14,10 @@ const DOT_INACTIVE_WIDTH = 8;
 const DOT_ACTIVE_OPACITY = 1;
 const DOT_INACTIVE_OPACITY = 0.4;
 
-const PAGE_TRANSLATE_Y = 30;
+const PAGE_CONTENT_HEIGHT = CAROUSEL_HEIGHT - 32;
+const PAGE_SLIDE_IN = PAGE_CONTENT_HEIGHT;
+const PAGE_SLIDE_OUT = -PAGE_CONTENT_HEIGHT;
+const PAGE_SCALE_INACTIVE = 0.95;
 
 type HomeCarouselProps = {
   children: React.ReactNode[];
@@ -61,19 +64,25 @@ function CarouselPage({
   index: number;
   children: React.ReactNode;
 }) {
-  const inputRange = [
-    (index - 1) * SCREEN_WIDTH,
-    index * SCREEN_WIDTH,
-    (index + 1) * SCREEN_WIDTH,
-  ];
+  const prev = (index - 1) * SCREEN_WIDTH;
+  const current = index * SCREEN_WIDTH;
+  const next = (index + 1) * SCREEN_WIDTH;
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
       {
         translateY: interpolate(
           scrollX.value,
-          inputRange,
-          [PAGE_TRANSLATE_Y, 0, PAGE_TRANSLATE_Y],
+          [prev, current, next],
+          [PAGE_SLIDE_IN, 0, PAGE_SLIDE_OUT],
+          "clamp",
+        ),
+      },
+      {
+        scale: interpolate(
+          scrollX.value,
+          [prev, current, next],
+          [PAGE_SCALE_INACTIVE, 1, PAGE_SCALE_INACTIVE],
           "clamp",
         ),
       },
@@ -81,11 +90,9 @@ function CarouselPage({
   }));
 
   return (
-    <View style={[styles.page, { width: SCREEN_WIDTH }]}>
-      <Animated.View style={[styles.pageContent, animatedStyle]}>
-        {children}
-      </Animated.View>
-    </View>
+    <Animated.View style={[styles.pageOverlay, animatedStyle]}>
+      {children}
+    </Animated.View>
   );
 }
 
@@ -98,6 +105,16 @@ export function HomeCarousel({ children, scrollX }: HomeCarouselProps) {
 
   return (
     <View style={styles.container}>
+      {/* Stacked content pages with fade + vertical slide */}
+      <View style={styles.pagesContainer} pointerEvents="box-none">
+        {children.map((child, index) => (
+          <CarouselPage key={index} scrollX={scrollX} index={index}>
+            {child}
+          </CarouselPage>
+        ))}
+      </View>
+
+      {/* Invisible scroll layer for horizontal swipe gesture */}
       <Animated.ScrollView
         horizontal
         pagingEnabled
@@ -105,14 +122,13 @@ export function HomeCarousel({ children, scrollX }: HomeCarouselProps) {
         decelerationRate="fast"
         onScroll={scrollHandler}
         scrollEventThrottle={16}
-        style={styles.scrollView}
+        style={styles.scrollOverlay}
       >
-        {children.map((child, index) => (
-          <CarouselPage key={index} scrollX={scrollX} index={index}>
-            {child}
-          </CarouselPage>
+        {children.map((_, index) => (
+          <View key={index} style={{ width: SCREEN_WIDTH }} />
         ))}
       </Animated.ScrollView>
+
       <View style={styles.indicators}>
         {children.map((_, index) => (
           <Dot key={index} scrollX={scrollX} index={index} />
@@ -126,14 +142,17 @@ const styles = StyleSheet.create({
   container: {
     height: CAROUSEL_HEIGHT,
   },
-  scrollView: {
-    flex: 1,
+  pagesContainer: {
+    ...StyleSheet.absoluteFillObject,
+    bottom: 32,
+    overflow: "hidden",
   },
-  page: {
-    height: CAROUSEL_HEIGHT - 32,
+  pageOverlay: {
+    ...StyleSheet.absoluteFillObject,
   },
-  pageContent: {
-    flex: 1,
+  scrollOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    bottom: 32,
   },
   indicators: {
     flexDirection: "row",
@@ -141,6 +160,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 6,
     paddingVertical: 12,
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   dot: {
     height: 8,
