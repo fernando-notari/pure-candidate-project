@@ -1,12 +1,12 @@
 import { LinearGradient } from "expo-linear-gradient";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 import Animated, { interpolate, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { ActiveGamesSection } from "../components/active-games-section";
 import type { ActionChipData } from "../components/action-chips-feed";
 import { CreatePage } from "../components/create-page/create-page";
 import { TableBackground } from "../components/create-page/table-background";
-import { FilterTags } from "../components/filter-tags";
+import { FilterTabs, type FilterAccent } from "../components/filter-tags";
 import { FriendsSection } from "../components/friends-section";
 import { GameRecommendation } from "../components/game-recommendation";
 import { GroupsSection } from "../components/groups-section";
@@ -22,6 +22,12 @@ const CURRENT_USER_ID = "1";
 const GAME_FILTERS = ["Hold'em", "SNG", "PLO4"] as const;
 type GameFilter = (typeof GAME_FILTERS)[number];
 
+const GAME_FILTER_ACCENTS: Partial<Record<GameFilter, FilterAccent>> = {
+  "Hold'em": { color: "#6B8FCC", bg: "#25335840" },
+  SNG: { color: "#6BAF8A", bg: "#3A5E4240" },
+  PLO4: { color: "#CC6B6B", bg: "#6F282A40" },
+};
+
 const MOCK_ACTIONS: ActionChipData[] = [
   { id: "1", avatar: getProfilePicture("profile_picture_1.webp"), name: "sesamejessie", action: "raised", amount: "$6" },
   { id: "2", avatar: getProfilePicture("profile_picture_2.webp"), name: "mike_p", action: "folded" },
@@ -32,7 +38,7 @@ const MOCK_ACTIONS: ActionChipData[] = [
 ];
 
 export function HomePage() {
-  const [activeFilters, setActiveFilters] = useState<Set<GameFilter>>(new Set());
+  const [activeFilter, setActiveFilter] = useState<GameFilter | null>(null);
   const scrollY = useSharedValue(0);
   const carouselScrollX = useSharedValue(0);
 
@@ -49,14 +55,11 @@ export function HomePage() {
     ? friends.map((f) => ({ id: f.id, profilePicture: f.profilePicture }))
     : [];
 
-  const toggleFilter = (filter: GameFilter) => {
-    setActiveFilters((prev) => {
-      const next = new Set(prev);
-      if (next.has(filter)) next.delete(filter);
-      else next.add(filter);
-      return next;
-    });
-  };
+  const handleFilterChange = useCallback((filter: GameFilter | null) => {
+    setActiveFilter(filter);
+  }, []);
+
+  const gamemodeFilters = activeFilter ? new Set([activeFilter]) : new Set<GameFilter>();
 
   const tableStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: -scrollY.value }],
@@ -105,16 +108,20 @@ export function HomePage() {
           ]}
         </HomeCarousel>
         <View style={styles.sections}>
-          <View style={styles.filterSection}>
-            <FilterTags
-              filters={GAME_FILTERS}
-              activeFilters={activeFilters}
-              onFilterChange={toggleFilter}
-            />
-            <HomepageSection title="Active Games" route="/active-games">
-              <ActiveGamesSection gamemodeFilters={activeFilters} />
-            </HomepageSection>
-          </View>
+          <HomepageSection
+            title="Active Games"
+            route="/active-games"
+            headerAccessory={
+              <FilterTabs
+                filters={GAME_FILTERS}
+                activeFilter={activeFilter}
+                onFilterChange={handleFilterChange}
+                accentColors={GAME_FILTER_ACCENTS}
+              />
+            }
+          >
+            <ActiveGamesSection gamemodeFilters={gamemodeFilters} />
+          </HomepageSection>
           <HomepageSection title="Friends" route="/friends">
             <FriendsSection userId={CURRENT_USER_ID} />
           </HomepageSection>
@@ -151,10 +158,7 @@ const styles = StyleSheet.create({
   },
   sections: {
     gap: 39,
-    paddingTop: 24,
+    paddingTop: 39,
     paddingHorizontal: 20,
-  },
-  filterSection: {
-    gap: 28,
   },
 });

@@ -1,61 +1,118 @@
-import { ScrollView, StyleSheet, Text, TouchableOpacity } from "react-native";
-import { theme } from "../theme";
+import { Pressable, StyleSheet, View } from "react-native";
+import Animated, {
+  interpolateColor,
+  useAnimatedStyle,
+  useDerivedValue,
+  withTiming,
+} from "react-native-reanimated";
 
-type FilterTagsProps<T extends string> = {
-  filters: readonly T[];
-  activeFilters: Set<T>;
-  onFilterChange: (filter: T) => void;
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+export type FilterAccent = {
+  color: string;
+  bg: string;
 };
 
-export function FilterTags<T extends string>({
-  filters,
-  activeFilters,
-  onFilterChange,
-}: FilterTagsProps<T>) {
+type FilterTabsProps<T extends string> = {
+  filters: readonly T[];
+  activeFilter: T | null;
+  onFilterChange: (filter: T | null) => void;
+  accentColors?: Partial<Record<T, FilterAccent>>;
+};
+
+function FilterTab<T extends string>({
+  label,
+  isActive,
+  color,
+  bg,
+  onPress,
+}: {
+  label: string;
+  isActive: boolean;
+  color: string;
+  bg: string;
+  onPress: () => void;
+}) {
+  const progress = useDerivedValue(() =>
+    withTiming(isActive ? 1 : 0, { duration: 150 }),
+  );
+
+  const pillStyle = useAnimatedStyle(() => ({
+    backgroundColor: interpolateColor(
+      progress.value,
+      [0, 1],
+      ["transparent", bg],
+    ),
+    paddingHorizontal: 14 * progress.value,
+  }));
+
+  const textStyle = useAnimatedStyle(() => ({
+    color: interpolateColor(
+      progress.value,
+      [0, 1],
+      ["#555558", color],
+    ),
+  }));
+
   return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.container}
+    <AnimatedPressable
+      onPress={onPress}
+      style={[styles.tab, pillStyle]}
+      hitSlop={20}
     >
+      <Animated.Text style={[styles.tabText, textStyle]}>
+        {label}
+      </Animated.Text>
+    </AnimatedPressable>
+  );
+}
+
+export function FilterTabs<T extends string>({
+  filters,
+  activeFilter,
+  onFilterChange,
+  accentColors,
+}: FilterTabsProps<T>) {
+  const defaultAccent = { color: "#FFFFFF", bg: "#FFFFFF14" };
+
+  return (
+    <View style={styles.row}>
+      <FilterTab
+        label="All"
+        isActive={activeFilter === null}
+        color={defaultAccent.color}
+        bg={defaultAccent.bg}
+        onPress={() => onFilterChange(null)}
+      />
       {filters.map((filter) => {
-        const isActive = activeFilters.has(filter);
+        const accent = accentColors?.[filter];
         return (
-          <TouchableOpacity
+          <FilterTab
             key={filter}
-            style={[styles.tag, isActive && styles.tagActive]}
+            label={filter}
+            isActive={activeFilter === filter}
+            color={accent?.color ?? defaultAccent.color}
+            bg={accent?.bg ?? defaultAccent.bg}
             onPress={() => onFilterChange(filter)}
-          >
-            <Text style={[styles.tagText, isActive && styles.tagTextActive]}>
-              {filter}
-            </Text>
-          </TouchableOpacity>
+          />
         );
       })}
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  row: {
     flexDirection: "row",
-    gap: 10,
+    gap: 28,
   },
-  tag: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 10,
-    backgroundColor: "#1C1C1E",
+  tab: {
+    paddingVertical: 7,
+    borderRadius: 20,
   },
-  tagActive: {
-    backgroundColor: theme.colors.foreground,
-  },
-  tagText: {
-    fontSize: 15,
+  tabText: {
+    fontSize: 14,
     fontWeight: "600",
-    color: theme.colors.foreground,
-  },
-  tagTextActive: {
-    color: theme.colors.background,
+    letterSpacing: -0.2,
   },
 });

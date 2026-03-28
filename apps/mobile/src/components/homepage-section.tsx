@@ -6,20 +6,24 @@ import { ChevronRightIcon } from "./icons";
 type HomepageSectionProps = {
     title: string;
     route: string;
+    headerAccessory?: ReactNode;
     children: ReactNode;
 };
 
-export function HomepageSection({ title, route, children }: HomepageSectionProps) {
+export function HomepageSection({ title, route, headerAccessory, children }: HomepageSectionProps) {
     return (
         <View style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity style={styles.titleRow}>
-                    <Text style={styles.title}>{title}</Text>
-                    <ChevronRightIcon size={11} color="#89898B" />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <Text style={styles.viewAll}>View all</Text>
-                </TouchableOpacity>
+            <View style={styles.headerBlock}>
+                <View style={styles.header}>
+                    <TouchableOpacity style={styles.titleRow}>
+                        <Text style={styles.title}>{title}</Text>
+                        <ChevronRightIcon size={11} color="#89898B" />
+                    </TouchableOpacity>
+                    <TouchableOpacity>
+                        <Text style={styles.viewAll}>View all</Text>
+                    </TouchableOpacity>
+                </View>
+                {headerAccessory}
             </View>
             {children}
         </View>
@@ -28,7 +32,10 @@ export function HomepageSection({ title, route, children }: HomepageSectionProps
 
 const styles = StyleSheet.create({
     container: {
-        gap: 23,
+        gap: 20,
+    },
+    headerBlock: {
+        gap: 16,
     },
     header: {
         flexDirection: "row",
