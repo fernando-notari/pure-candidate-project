@@ -232,7 +232,7 @@ const emptyStyles = StyleSheet.create({
   card: {
     width: 48,
     height: 67,
-    opacity: 0.4,
+    opacity: 0.7,
   },
   title: {
     fontSize: 15,
@@ -374,7 +374,7 @@ export function ActiveGamesSection({
                           </Text>
                         </View>
                         <Text style={styles.footerLabel}>
-                          {friendsInGame === 1 ? "friend" : "friends"} playing
+                          {friendsInGame === 1 ? "Friend" : "Friends"} playing
                         </Text>
                       </View>
                     )}
