@@ -1,5 +1,6 @@
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { PlusIcon } from "./icons";
+import { ErrorState } from "./error-state";
 import { theme } from "../theme";
 import { api } from "../trpc";
 import { getProfilePicture } from "../utils/profile-pictures";
@@ -21,17 +22,6 @@ function FriendsSkeleton() {
     );
 }
 
-function ErrorState({ onRetry }: { onRetry: () => void }) {
-    return (
-        <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>Failed to load friends</Text>
-            <TouchableOpacity onPress={onRetry}>
-                <Text style={styles.retryText}>Tap to retry</Text>
-            </TouchableOpacity>
-        </View>
-    );
-}
-
 export function FriendsSection({ userId }: FriendsSectionProps) {
     const { data: friends, isLoading, isError, refetch } = api.friendship.getByUserId.useQuery({ userId });
 
@@ -40,7 +30,7 @@ export function FriendsSection({ userId }: FriendsSectionProps) {
     }
 
     if (isError) {
-        return <ErrorState onRetry={() => refetch()} />;
+        return <ErrorState message="Failed to load friends" onRetry={() => refetch()} />;
     }
 
     if (!friends || friends.length === 0) {
@@ -67,7 +57,7 @@ export function FriendsSection({ userId }: FriendsSectionProps) {
             ))}
             <TouchableOpacity style={styles.item}>
                 <View style={styles.inviteButton}>
-                    <PlusIcon size={24} color="#8E8E93" />
+                    <PlusIcon size={24} color={theme.colors.muted} />
                 </View>
                 <Text style={styles.username}>Invite</Text>
             </TouchableOpacity>
@@ -96,7 +86,7 @@ const styles = StyleSheet.create({
         width: 65,
         height: 65,
         borderRadius: 33,
-        backgroundColor: "#1C1C1E",
+        backgroundColor: theme.colors.surface,
     },
     onlineDot: {
         position: "absolute",
@@ -105,9 +95,9 @@ const styles = StyleSheet.create({
         width: 12,
         height: 12,
         borderRadius: 6,
-        backgroundColor: "#007AFF",
+        backgroundColor: theme.colors.blue,
         borderWidth: 2,
-        borderColor: "#0F0F10",
+        borderColor: theme.colors.background,
     },
     username: {
         fontSize: 12,
@@ -119,12 +109,12 @@ const styles = StyleSheet.create({
         width: 65,
         height: 65,
         borderRadius: 33,
-        backgroundColor: "#1C1C1E",
+        backgroundColor: theme.colors.surface,
         alignItems: "center",
         justifyContent: "center",
     },
     skeleton: {
-        backgroundColor: "#1C1C1E",
+        backgroundColor: theme.colors.surface,
     },
     skeletonAvatar: {
         width: 65,
@@ -135,19 +125,6 @@ const styles = StyleSheet.create({
         width: 56,
         height: 12,
         borderRadius: 6,
-    },
-    errorContainer: {
-        alignItems: "center",
-        gap: 8,
-        paddingVertical: 16,
-    },
-    errorText: {
-        fontSize: 14,
-        color: theme.colors.muted,
-    },
-    retryText: {
-        fontSize: 14,
-        color: "#007AFF",
     },
     emptyText: {
         fontSize: 14,

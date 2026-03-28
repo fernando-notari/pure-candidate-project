@@ -14,32 +14,24 @@ import Svg, {
   LinearGradient as SvgLinearGradient,
   Stop,
 } from "react-native-svg";
-import { theme } from "../theme";
-import { api } from "../trpc";
+import { theme } from "../../theme";
+import { api } from "../../trpc";
+import { ErrorState } from "../error-state";
 import {
   getGroupInitials,
-  groupCardColors,
-  defaultGroupColors,
-} from "../utils/groups";
+  getGroupColors,
+} from "../../utils/groups";
+import { darkenColor, formatBlind, getStakes } from "../../utils/format";
+import { CURRENT_USER_ID } from "../../constants";
 
-import aceOfSpades from "../../assets/playing-cards/a-spade.png";
-import aceOfHearts from "../../assets/playing-cards/a-heart.png";
-import aceOfClover from "../../assets/playing-cards/a-clover.png";
-import kingOfSpades from "../../assets/playing-cards/k-spade.png";
-import queenOfHearts from "../../assets/playing-cards/q-heart.png";
-import jackOfDiamonds from "../../assets/playing-cards/j-diamond.png";
-
-const CURRENT_USER_ID = "1";
+import aceOfSpades from "../../../assets/playing-cards/a-spade.png";
+import aceOfHearts from "../../../assets/playing-cards/a-heart.png";
+import aceOfClover from "../../../assets/playing-cards/a-clover.png";
+import kingOfSpades from "../../../assets/playing-cards/k-spade.png";
+import queenOfHearts from "../../../assets/playing-cards/q-heart.png";
+import jackOfDiamonds from "../../../assets/playing-cards/j-diamond.png";
 
 type CardColors = [string, string];
-
-function darkenColor(hex: string, factor: number): string {
-  const raw = hex.replace("#", "").slice(0, 6);
-  const r = Math.round(parseInt(raw.slice(0, 2), 16) * factor);
-  const g = Math.round(parseInt(raw.slice(2, 4), 16) * factor);
-  const b = Math.round(parseInt(raw.slice(4, 6), 16) * factor);
-  return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
-}
 
 const gameAccentColors: Record<string, string> = {
   NLH: "#253358",
@@ -52,16 +44,6 @@ const DARKEN_FACTOR = 0.3;
 function getCardColors(gamemode: string): CardColors {
   const accent = gameAccentColors[gamemode] ?? "#282828";
   return [darkenColor(accent, DARKEN_FACTOR), accent];
-}
-
-function formatBlind(value: number): string {
-  return value % 1 === 0 ? `$${value}` : `$${value.toFixed(2)}`;
-}
-
-function getStakes(bigBlind: number) {
-  const bb = bigBlind / 100;
-  const sb = bb / 2;
-  return { sb: formatBlind(sb), bb: formatBlind(bb) };
 }
 
 type SeatIndicatorProps = {
@@ -203,17 +185,6 @@ function ActiveGamesSkeleton() {
   );
 }
 
-function ErrorState({ onRetry }: { onRetry: () => void }) {
-  return (
-    <View style={styles.errorContainer}>
-      <Text style={styles.errorText}>Failed to load games</Text>
-      <TouchableOpacity onPress={onRetry}>
-        <Text style={styles.retryText}>Tap to retry</Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
-
 const EMPTY_CARDS = [
   { source: aceOfClover, rotate: "-9deg", marginTop: 4 },
   { source: jackOfDiamonds, rotate: "4deg", marginTop: -6 },
@@ -334,7 +305,7 @@ export function ActiveGamesSection({
   }
 
   if (isError) {
-    return <ErrorState onRetry={() => refetchGames()} />;
+    return <ErrorState message="Failed to load games" onRetry={() => refetchGames()} />;
   }
 
   const hasActiveFilters = gamemodeFilters && gamemodeFilters.size > 0;
@@ -381,14 +352,12 @@ export function ActiveGamesSection({
                     {group && (
                       <View style={styles.footerRow}>
                         <LinearGradient
-                          colors={
-                            (groupCardColors[group.backgroundColor] ?? defaultGroupColors).circle
-                          }
+                          colors={getGroupColors(group.backgroundColor).circle}
                           start={{ x: 0, y: 0 }}
                           end={{ x: 1, y: 1 }}
                           style={styles.groupIcon}
                         >
-                          <Text style={[styles.groupIconInitials, { color: (groupCardColors[group.backgroundColor] ?? defaultGroupColors).initialsColor }]}>
+                          <Text style={[styles.groupIconInitials, { color: getGroupColors(group.backgroundColor).initialsColor }]}>
                             {getGroupInitials(group.name)}
                           </Text>
                         </LinearGradient>
@@ -527,19 +496,6 @@ const styles = StyleSheet.create({
     width: 200,
     height: 180,
     borderRadius: 16,
-    backgroundColor: "#1C1C1E",
-  },
-  errorContainer: {
-    alignItems: "center",
-    gap: 8,
-    paddingVertical: 16,
-  },
-  errorText: {
-    fontSize: 14,
-    color: theme.colors.muted,
-  },
-  retryText: {
-    fontSize: 14,
-    color: "#007AFF",
+    backgroundColor: theme.colors.surface,
   },
 });

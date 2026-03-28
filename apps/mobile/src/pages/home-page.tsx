@@ -2,22 +2,22 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useCallback, useState } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 import Animated, { interpolate, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
-import { ActiveGamesSection } from "../components/active-games-section";
-import type { ActionChipData } from "../components/action-chips-feed";
+import { ActiveGamesSection } from "../components/active-games-section/active-games-section";
+import type { ActionChipData } from "../components/recommendation-page/action-chips-ticker";
 import { CreatePage } from "../components/create-page/create-page";
-import { TableBackground } from "../components/create-page/table-background";
-import { FilterTabs, type FilterAccent } from "../components/filter-tags";
+import { PokerTablesBackground } from "../components/home/poker-tables-background";
+import { FilterTabs, type FilterAccent } from "../components/active-games-section/filter-tabs";
 import { FriendsSection } from "../components/friends-section";
-import { GameRecommendation } from "../components/game-recommendation";
+import { GameRecommendation } from "../components/recommendation-page/game-recommendation";
 import { GroupsSection } from "../components/groups-section";
-import { HomeCarousel } from "../components/home-carousel";
-import { HomeHeader } from "../components/home-header";
-import { HomepageSection } from "../components/homepage-section";
+import { HomeCarousel } from "../components/home/carousel";
+import { HomeHeader } from "../components/home/header";
+import { HomeSection } from "../components/home/section";
 import { api } from "../trpc";
 import { getProfilePicture } from "../utils/profile-pictures";
+import { CURRENT_USER_ID } from "../constants";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const CURRENT_USER_ID = "1";
 
 const GAME_FILTERS = ["Hold'em", "SNG", "PLO4"] as const;
 type GameFilter = (typeof GAME_FILTERS)[number];
@@ -74,7 +74,7 @@ export function HomePage() {
       <Animated.View
         style={[styles.tableContainer, tableStyle]}
       >
-        <TableBackground scrollX={carouselScrollX} />
+        <PokerTablesBackground scrollX={carouselScrollX} />
         <Animated.View style={[styles.gradientOverlay, gradientStyle]} pointerEvents="none">
           <LinearGradient
             colors={["#0F0F1000", "#0F0F10"]}
@@ -108,9 +108,8 @@ export function HomePage() {
           ]}
         </HomeCarousel>
         <View style={styles.sections}>
-          <HomepageSection
+          <HomeSection
             title="Active Games"
-            route="/active-games"
             headerAccessory={
               <FilterTabs
                 filters={GAME_FILTERS}
@@ -121,13 +120,13 @@ export function HomePage() {
             }
           >
             <ActiveGamesSection gamemodeFilters={gamemodeFilters} />
-          </HomepageSection>
-          <HomepageSection title="Friends" route="/friends">
+          </HomeSection>
+          <HomeSection title="Friends">
             <FriendsSection userId={CURRENT_USER_ID} />
-          </HomepageSection>
-          <HomepageSection title="Groups" route="/groups">
+          </HomeSection>
+          <HomeSection title="Groups">
             <GroupsSection />
-          </HomepageSection>
+          </HomeSection>
         </View>
       </Animated.ScrollView>
       <HomeHeader

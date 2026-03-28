@@ -1,26 +1,10 @@
-import { StyleSheet, Text, View } from "react-native";
 import { GroupsSection } from "../components/groups-section";
-import { theme } from "../theme";
+import { PageShell } from "../components/page-shell";
 
 export function GroupsPage() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Groups</Text>
+    <PageShell title="Groups">
       <GroupsSection />
-    </View>
+    </PageShell>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 80,
-    paddingHorizontal: 20,
-    gap: 24,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "700",
-    color: theme.colors.foreground,
-  },
-});

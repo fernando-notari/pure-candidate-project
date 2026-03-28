@@ -1,20 +1,16 @@
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { LiquidGlassView } from "@callstack/liquid-glass";
 import { LinearGradient } from "expo-linear-gradient";
-import { theme } from "../theme";
-import { WalletIcon } from "./icons";
-import { getProfilePicture } from "../utils/profile-pictures";
+import { theme } from "../../theme";
+import { WalletIcon } from "../icons";
+import { getProfilePicture } from "../../utils/profile-pictures";
+import { formatBalance } from "../../utils/format";
 
 type HomeHeaderProps = {
   profilePicture: string;
   balance: number;
   onBalancePress?: () => void;
 };
-
-function formatBalance(cents: number): string {
-  const dollars = cents / 100;
-  return `$${dollars.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-}
 
 export function HomeHeader({ profilePicture, balance, onBalancePress }: HomeHeaderProps) {
   return (
@@ -75,7 +71,7 @@ const styles = StyleSheet.create({
     width: 45,
     height: 45,
     borderRadius: 23,
-    backgroundColor: "#1C1C1E",
+    backgroundColor: theme.colors.surface,
   },
   title: {
     fontSize: 24,

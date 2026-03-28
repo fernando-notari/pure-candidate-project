@@ -1,4 +1,5 @@
 import { Image, type ImageSourcePropType, StyleSheet, Text, View } from "react-native";
+import { theme } from "../../theme";
 
 export type PlayerAction = "called" | "raised" | "folded" | "checked" | "bet";
 
@@ -53,7 +54,7 @@ const styles = StyleSheet.create({
     width: 29,
     height: 29,
     borderRadius: 15,
-    backgroundColor: "#1C1C1E",
+    backgroundColor: theme.colors.surface,
   },
   textColumn: {
     gap: 1,

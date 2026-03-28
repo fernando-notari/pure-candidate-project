@@ -1,7 +1,7 @@
 import { LiquidGlassView } from "@callstack/liquid-glass";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { theme } from "../theme";
-import { ActionChipsFeed, type ActionChipData } from "./action-chips-feed";
+import { theme } from "../../theme";
+import { ActionChipsTicker, type ActionChipData } from "./action-chips-ticker";
 
 type GameRecommendationProps = {
   stakes: string;
@@ -26,7 +26,7 @@ export function GameRecommendation({
   return (
     <View style={styles.container}>
       {recentActions && recentActions.length > 0 && (
-        <ActionChipsFeed actions={recentActions} />
+        <ActionChipsTicker actions={recentActions} />
       )}
       <View style={styles.bottom}>
         <View style={styles.content}>

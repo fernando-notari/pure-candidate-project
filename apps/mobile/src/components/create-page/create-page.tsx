@@ -1,6 +1,6 @@
 import { StyleSheet, View } from "react-native";
 import { CreateButton } from "./create-button";
-import { FriendsOnlineTag } from "./friends-online-tag";
+import { OnlineFriendsBadge } from "./online-friends-badge";
 
 type CreatePageProps = {
   onlineCount: number;
@@ -15,7 +15,7 @@ export function CreatePage({ onlineCount, onlineFriends, onCreatePress }: Create
         <View style={styles.spacer} />
         <CreateButton onPress={onCreatePress} />
         <View style={styles.bottom}>
-          <FriendsOnlineTag friends={onlineFriends} onlineCount={onlineCount} />
+          <OnlineFriendsBadge friends={onlineFriends} onlineCount={onlineCount} />
         </View>
       </View>
     </View>

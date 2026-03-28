@@ -1,27 +1,24 @@
 import type { ReactNode } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { theme } from "../theme";
-import { ChevronRightIcon } from "./icons";
+import { StyleSheet, Text, View } from "react-native";
+import { theme } from "../../theme";
+import { ChevronRightIcon } from "../icons";
 
-type HomepageSectionProps = {
+type HomeSectionProps = {
     title: string;
-    route: string;
     headerAccessory?: ReactNode;
     children: ReactNode;
 };
 
-export function HomepageSection({ title, route, headerAccessory, children }: HomepageSectionProps) {
+export function HomeSection({ title, headerAccessory, children }: HomeSectionProps) {
     return (
         <View style={styles.container}>
             <View style={styles.headerBlock}>
                 <View style={styles.header}>
-                    <TouchableOpacity style={styles.titleRow}>
+                    <View style={styles.titleRow}>
                         <Text style={styles.title}>{title}</Text>
                         <ChevronRightIcon size={11} color="#89898B" />
-                    </TouchableOpacity>
-                    <TouchableOpacity>
-                        <Text style={styles.viewAll}>View all</Text>
-                    </TouchableOpacity>
+                    </View>
+                    <Text style={styles.viewAll}>View all</Text>
                 </View>
                 {headerAccessory}
             </View>

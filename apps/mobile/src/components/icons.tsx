@@ -82,34 +82,6 @@ export function ChevronRightIcon({ size = 24, color = "#FFFFFF" }: IconProps) {
 	);
 }
 
-export function UserIcon({ size = 24, color = "#8E8E93" }: IconProps) {
-	return (
-		<Svg width={size} height={size} viewBox="0 0 15 15" fill="none">
-			<Path
-				d="M7.2053 7.6576C7.15805 7.65085 7.09731 7.65085 7.04332 7.6576C5.8555 7.61711 4.91064 6.64538 4.91064 5.45094C4.91064 4.22952 5.89599 3.23755 7.12431 3.23755C8.34587 3.23755 9.33798 4.22952 9.33798 5.45094C9.33123 6.64538 8.39312 7.61711 7.2053 7.6576Z"
-				stroke={color}
-				strokeWidth={0.75}
-				strokeLinecap="round"
-				strokeLinejoin="round"
-			/>
-			<Path
-				d="M11.6724 12.107C10.4711 13.2069 8.87835 13.875 7.12361 13.875C5.36885 13.875 3.77609 13.2069 2.57477 12.107C2.64226 11.4726 3.0472 10.8518 3.76934 10.3659C5.61856 9.13778 8.64213 9.13778 10.4779 10.3659C11.2 10.8518 11.6049 11.4726 11.6724 12.107Z"
-				stroke={color}
-				strokeWidth={0.75}
-				strokeLinecap="round"
-				strokeLinejoin="round"
-			/>
-			<Path
-				d="M7.12399 13.8713C10.8513 13.8713 13.873 10.85 13.873 7.12313C13.873 3.39624 10.8513 0.375 7.12399 0.375C3.39663 0.375 0.375 3.39624 0.375 7.12313C0.375 10.85 3.39663 13.8713 7.12399 13.8713Z"
-				stroke={color}
-				strokeWidth={0.75}
-				strokeLinecap="round"
-				strokeLinejoin="round"
-			/>
-		</Svg>
-	);
-}
-
 export function WalletIcon({ size = 24, color = "#8E8E93" }: IconProps) {
 	return (
 		<Svg width={size} height={size} viewBox="0 0 20 23" fill="none">

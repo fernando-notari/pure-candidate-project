@@ -20,7 +20,7 @@ export type ActionChipData = {
   amount?: string;
 };
 
-type ActionChipsFeedProps = {
+type ActionChipsTickerProps = {
   actions: ActionChipData[];
 };
 
@@ -73,7 +73,7 @@ function FloatingChip({
         true,
       ),
     );
-  }, []);
+  }, [config]);
 
   const floatStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
@@ -82,7 +82,7 @@ function FloatingChip({
   return <Animated.View style={floatStyle}>{children}</Animated.View>;
 }
 
-export function ActionChipsFeed({ actions }: ActionChipsFeedProps) {
+export function ActionChipsTicker({ actions }: ActionChipsTickerProps) {
   const visible = actions.slice(0, 5);
   const [renderKey, setRenderKey] = useState(0);
 

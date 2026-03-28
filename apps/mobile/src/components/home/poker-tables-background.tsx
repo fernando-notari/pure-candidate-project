@@ -5,31 +5,43 @@ import Animated, {
   type SharedValue,
 } from "react-native-reanimated";
 
-const blueTable = require("../../../assets/tables/blue-table.png");
-const greenTable = require("../../../assets/tables/green-table.png");
-const redTable = require("../../../assets/tables/red-table.png");
+import blueTable from "../../../assets/tables/blue-table.png";
+import greenTable from "../../../assets/tables/green-table.png";
+import redTable from "../../../assets/tables/red-table.png";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 const TABLE_WIDTH = SCREEN_WIDTH * 3.1;
 const TABLE_HEIGHT = TABLE_WIDTH * 1.4;
 
-type TableBackgroundProps = {
+type PokerTablesBackgroundProps = {
   scrollX: SharedValue<number>;
 };
 
-export function TableBackground({ scrollX }: TableBackgroundProps) {
+export function PokerTablesBackground({ scrollX }: PokerTablesBackgroundProps) {
   const blueStyle = useAnimatedStyle(() => {
-    const progress = interpolate(scrollX.value, [0, SCREEN_WIDTH], [0, 1], "clamp");
+    const progress = interpolate(
+      scrollX.value,
+      [0, SCREEN_WIDTH],
+      [0, 1],
+      "clamp",
+    );
     return {
       transform: [
-        { translateY: interpolate(progress, [0, 1], [SCREEN_HEIGHT * 0.18, 0]) },
+        {
+          translateY: interpolate(progress, [0, 1], [SCREEN_HEIGHT * 0.18, 0]),
+        },
         { scale: interpolate(progress, [0, 1], [1.55, 1]) },
       ],
     };
   });
 
   const greenStyle = useAnimatedStyle(() => {
-    const progress = interpolate(scrollX.value, [0, SCREEN_WIDTH], [0, 1], "clamp");
+    const progress = interpolate(
+      scrollX.value,
+      [0, SCREEN_WIDTH],
+      [0, 1],
+      "clamp",
+    );
     return {
       opacity: interpolate(progress, [0, 0.5, 1], [0, 0.3, 1]),
       transform: [
@@ -40,7 +52,12 @@ export function TableBackground({ scrollX }: TableBackgroundProps) {
   });
 
   const redStyle = useAnimatedStyle(() => {
-    const progress = interpolate(scrollX.value, [0, SCREEN_WIDTH], [0, 1], "clamp");
+    const progress = interpolate(
+      scrollX.value,
+      [0, SCREEN_WIDTH],
+      [0, 1],
+      "clamp",
+    );
     return {
       opacity: interpolate(progress, [0, 0.5, 1], [0, 0.3, 1]),
       transform: [

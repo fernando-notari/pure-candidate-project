@@ -1,7 +1,8 @@
 import { Image, StyleSheet, Text, View } from "react-native";
+import { theme } from "../../theme";
 import { getProfilePicture } from "../../utils/profile-pictures";
 
-type FriendsOnlineTagProps = {
+type OnlineFriendsBadgeProps = {
   friends: { id: string; profilePicture: string }[];
   onlineCount: number;
 };
@@ -30,7 +31,7 @@ function GradientText({ text }: { text: string }) {
   );
 }
 
-export function FriendsOnlineTag({ friends, onlineCount }: FriendsOnlineTagProps) {
+export function OnlineFriendsBadge({ friends, onlineCount }: OnlineFriendsBadgeProps) {
   if (onlineCount === 0) return null;
 
   const visibleFriends = friends.slice(0, MAX_AVATARS);
@@ -75,7 +76,7 @@ const styles = StyleSheet.create({
     height: 21,
     borderRadius: 11,
     borderWidth: 2,
-    borderColor: "#1C1C1E",
+    borderColor: theme.colors.surface,
     backgroundColor: "#2C2C2E",
   },
   text: {

@@ -8,11 +8,12 @@ import {
 } from "react-native";
 import { theme } from "../theme";
 import { api } from "../trpc";
+import { ErrorState } from "./error-state";
 import {
   getGroupInitials,
-  groupCardColors,
-  defaultGroupColors,
+  getGroupColors,
 } from "../utils/groups";
+import { formatMemberCount } from "../utils/format";
 
 function GroupsSkeleton() {
   return (
@@ -28,22 +29,6 @@ function GroupsSkeleton() {
   );
 }
 
-function ErrorState({ onRetry }: { onRetry: () => void }) {
-  return (
-    <View style={styles.errorContainer}>
-      <Text style={styles.errorText}>Failed to load groups</Text>
-      <TouchableOpacity onPress={onRetry}>
-        <Text style={styles.retryText}>Tap to retry</Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
-
-function formatMemberCount(count: number): string {
-  return `${count.toLocaleString()} members`;
-}
-
-
 export function GroupsSection() {
   const {
     data: groups,
@@ -57,7 +42,7 @@ export function GroupsSection() {
   }
 
   if (isError) {
-    return <ErrorState onRetry={() => refetch()} />;
+    return <ErrorState message="Failed to load groups" onRetry={() => refetch()} />;
   }
 
   if (!groups || groups.length === 0) {
@@ -74,20 +59,18 @@ export function GroupsSection() {
       {groups.map((group) => (
         <TouchableOpacity key={group.id} style={styles.card}>
           <LinearGradient
-            colors={(groupCardColors[group.backgroundColor] ?? defaultGroupColors).bg}
+            colors={getGroupColors(group.backgroundColor).bg}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.cardSquare}
           >
             <LinearGradient
-              colors={
-                (groupCardColors[group.backgroundColor] ?? defaultGroupColors).circle
-              }
+              colors={getGroupColors(group.backgroundColor).circle}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.cardCircle}
             >
-              <Text style={[styles.cardInitials, { color: (groupCardColors[group.backgroundColor] ?? defaultGroupColors).initialsColor }]}>{getGroupInitials(group.name)}</Text>
+              <Text style={[styles.cardInitials, { color: getGroupColors(group.backgroundColor).initialsColor }]}>{getGroupInitials(group.name)}</Text>
             </LinearGradient>
           </LinearGradient>
           <View style={styles.cardText}>
@@ -159,7 +142,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   skeleton: {
-    backgroundColor: "#1C1C1E",
+    backgroundColor: theme.colors.surface,
   },
   skeletonSquare: {
     width: 119,
@@ -175,19 +158,6 @@ const styles = StyleSheet.create({
     width: 72,
     height: 10,
     borderRadius: 5,
-  },
-  errorContainer: {
-    alignItems: "center",
-    gap: 8,
-    paddingVertical: 16,
-  },
-  errorText: {
-    fontSize: 14,
-    color: theme.colors.muted,
-  },
-  retryText: {
-    fontSize: 14,
-    color: "#007AFF",
   },
   emptyText: {
     fontSize: 14,
