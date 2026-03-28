@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   spacer: {
-    flex: 1.5,
+    flex: 1.25,
   },
   bottom: {
     flex: 0.6,
