@@ -68,7 +68,6 @@ function CarouselPage({
   ];
 
   const animatedStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(scrollX.value, inputRange, [0, 1, 0], "clamp"),
     transform: [
       {
         translateY: interpolate(
@@ -132,7 +131,6 @@ const styles = StyleSheet.create({
   },
   page: {
     height: CAROUSEL_HEIGHT - 32,
-    overflow: "hidden",
   },
   pageContent: {
     flex: 1,
