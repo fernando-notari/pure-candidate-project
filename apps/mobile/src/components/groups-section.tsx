@@ -8,6 +8,11 @@ import {
 } from "react-native";
 import { theme } from "../theme";
 import { api } from "../trpc";
+import {
+  getGroupInitials,
+  groupCardColors,
+  defaultGroupColors,
+} from "../utils/groups";
 
 function GroupsSkeleton() {
   return (
@@ -38,43 +43,6 @@ function formatMemberCount(count: number): string {
   return `${count.toLocaleString()} members`;
 }
 
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((word) => word[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
-
-// TODO: Hardcoded for demo. The backend `backgroundColor` field (named colors like "blue") isn't
-// sufficient for the gradients needed by the design. Need to define a proper color scheme per group
-// (e.g. gradient start/end pairs for both background and circle) in the backend data model.
-
-type CardColors = {
-  bg: [string, string];
-  circle: [string, string];
-};
-
-const cardColors: Record<string, CardColors> = {
-  blue: {
-    bg: ["#4881AF", "#295083"],
-    circle: ["#E0CAD6", "#907080"],
-  },
-  black: {
-    bg: ["#333333", "#000000"],
-    circle: ["#333333", "#0A0A0A"],
-  },
-  limegreen: {
-    bg: ["#DCFFDF", "#3A5E42"],
-    circle: ["#BEE4A0", "#6EAA50"],
-  },
-};
-
-const defaultColors: CardColors = {
-  bg: ["#383838", "#111111"],
-  circle: ["#444444", "#1A1A1A"],
-};
 
 export function GroupsSection() {
   const {
@@ -106,20 +74,20 @@ export function GroupsSection() {
       {groups.map((group) => (
         <TouchableOpacity key={group.id} style={styles.card}>
           <LinearGradient
-            colors={(cardColors[group.backgroundColor] ?? defaultColors).bg}
+            colors={(groupCardColors[group.backgroundColor] ?? defaultGroupColors).bg}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.cardSquare}
           >
             <LinearGradient
               colors={
-                (cardColors[group.backgroundColor] ?? defaultColors).circle
+                (groupCardColors[group.backgroundColor] ?? defaultGroupColors).circle
               }
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.cardCircle}
             >
-              <Text style={styles.cardInitials}>{getInitials(group.name)}</Text>
+              <Text style={[styles.cardInitials, { color: (groupCardColors[group.backgroundColor] ?? defaultGroupColors).initialsColor }]}>{getGroupInitials(group.name)}</Text>
             </LinearGradient>
           </LinearGradient>
           <View style={styles.cardText}>
@@ -174,7 +142,6 @@ const styles = StyleSheet.create({
   cardInitials: {
     fontSize: 34,
     fontWeight: "400",
-    color: "rgba(255, 255, 255, 0.6)",
   },
   cardName: {
     fontSize: 15,
