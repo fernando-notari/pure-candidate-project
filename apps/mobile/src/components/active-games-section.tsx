@@ -19,8 +19,12 @@ import { theme } from "../theme";
 import { api } from "../trpc";
 import { UserIcon } from "./icons";
 
-const aceOfSpades = require("../../assets/playing-cards/A-Spade.png");
-const aceOfHearts = require("../../assets/playing-cards/A-Heart.png");
+const aceOfSpades = require("../../assets/playing-cards/a-spade.png");
+const aceOfHearts = require("../../assets/playing-cards/a-heart.png");
+const aceOfClover = require("../../assets/playing-cards/a-clover.png");
+const kingOfSpades = require("../../assets/playing-cards/k-spade.png");
+const queenOfHearts = require("../../assets/playing-cards/q-heart.png");
+const jackOfDiamonds = require("../../assets/playing-cards/j-diamond.png");
 
 const CURRENT_USER_ID = "1";
 
@@ -199,6 +203,62 @@ function ErrorState({ onRetry }: { onRetry: () => void }) {
   );
 }
 
+const EMPTY_CARDS = [
+  { source: aceOfClover, rotate: "-9deg", marginTop: 4 },
+  { source: jackOfDiamonds, rotate: "4deg", marginTop: -6 },
+  { source: kingOfSpades, rotate: "-3deg", marginTop: 8 },
+  { source: queenOfHearts, rotate: "10deg", marginTop: -2 },
+];
+
+function EmptyState({ isFiltered }: { isFiltered: boolean }) {
+  return (
+    <View style={emptyStyles.container}>
+      <View style={emptyStyles.cardsRow}>
+        {EMPTY_CARDS.map((card, i) => (
+          <Image
+            key={i}
+            source={card.source}
+            style={[
+              emptyStyles.card,
+              {
+                marginTop: card.marginTop,
+                transform: [{ rotate: card.rotate }],
+              },
+            ]}
+          />
+        ))}
+      </View>
+      <Text style={emptyStyles.title}>
+        {isFiltered ? "No matching games" : "No active games"}
+      </Text>
+    </View>
+  );
+}
+
+const emptyStyles = StyleSheet.create({
+  container: {
+    alignItems: "center",
+    justifyContent: "center",
+    height: 170.5,
+    gap: 16,
+  },
+  cardsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 24,
+  },
+  card: {
+    width: 48,
+    height: 67,
+    opacity: 0.4,
+  },
+  title: {
+    fontSize: 15,
+    fontWeight: "500",
+    color: theme.colors.muted,
+  },
+});
+
 const FILTER_TO_GAMEMODE: Record<string, string[]> = {
   "Hold'em": ["NLH"],
   SNG: ["SNG"],
@@ -264,8 +324,10 @@ export function ActiveGamesSection({ gamemodeFilters }: ActiveGamesSectionProps)
     return <ErrorState onRetry={() => refetchGames()} />;
   }
 
+  const hasActiveFilters = gamemodeFilters && gamemodeFilters.size > 0;
+
   if (!games || filteredGames.length === 0) {
-    return <Text style={styles.emptyText}>No active games</Text>;
+    return <EmptyState isFiltered={!!hasActiveFilters} />;
   }
 
   return (
@@ -459,9 +521,5 @@ const styles = StyleSheet.create({
   retryText: {
     fontSize: 14,
     color: "#007AFF",
-  },
-  emptyText: {
-    fontSize: 14,
-    color: theme.colors.muted,
   },
 });
