@@ -1,5 +1,4 @@
 import { StyleSheet, View } from "react-native";
-import { LiquidGlassContainerView } from "@callstack/liquid-glass";
 import { CreateButton } from "./create-button";
 import { FriendsOnlineTag } from "./friends-online-tag";
 
@@ -11,7 +10,7 @@ type CreatePageProps = {
 
 export function CreatePage({ onlineCount, onlineFriends, onCreatePress }: CreatePageProps) {
   return (
-    <LiquidGlassContainerView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.content}>
         <View style={styles.spacer} />
         <CreateButton onPress={onCreatePress} />
@@ -19,7 +18,7 @@ export function CreatePage({ onlineCount, onlineFriends, onCreatePress }: Create
           <FriendsOnlineTag friends={onlineFriends} onlineCount={onlineCount} />
         </View>
       </View>
-    </LiquidGlassContainerView>
+    </View>
   );
 }
 
