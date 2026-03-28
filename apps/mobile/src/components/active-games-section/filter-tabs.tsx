@@ -1,12 +1,13 @@
-import { Pressable, StyleSheet, View } from "react-native";
+import { useCallback, useRef, useState } from "react";
+import { Pressable, StyleSheet, View, type LayoutChangeEvent } from "react-native";
 import Animated, {
   interpolateColor,
   useAnimatedStyle,
   useDerivedValue,
+  useSharedValue,
+  withSpring,
   withTiming,
 } from "react-native-reanimated";
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export type FilterAccent = {
   color: string;
@@ -20,31 +21,27 @@ type FilterTabsProps<T extends string> = {
   accentColors?: Partial<Record<T, FilterAccent>>;
 };
 
-function FilterTab<T extends string>({
+type TabLayout = { x: number; width: number };
+
+const SPRING_CONFIG = { damping: 20, stiffness: 200, mass: 0.8 };
+const UNDERLINE_HEIGHT = 2;
+
+function FilterTab({
   label,
   isActive,
   color,
-  bg,
   onPress,
+  onLayout,
 }: {
   label: string;
   isActive: boolean;
   color: string;
-  bg: string;
   onPress: () => void;
+  onLayout: (e: LayoutChangeEvent) => void;
 }) {
   const progress = useDerivedValue(() =>
     withTiming(isActive ? 1 : 0, { duration: 150 }),
   );
-
-  const pillStyle = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(
-      progress.value,
-      [0, 1],
-      ["transparent", bg],
-    ),
-    paddingHorizontal: 14 * progress.value,
-  }));
 
   const textStyle = useAnimatedStyle(() => ({
     color: interpolateColor(
@@ -55,15 +52,11 @@ function FilterTab<T extends string>({
   }));
 
   return (
-    <AnimatedPressable
-      onPress={onPress}
-      style={[styles.tab, pillStyle]}
-      hitSlop={20}
-    >
+    <Pressable onPress={onPress} onLayout={onLayout} hitSlop={20}>
       <Animated.Text style={[styles.tabText, textStyle]}>
         {label}
       </Animated.Text>
-    </AnimatedPressable>
+    </Pressable>
   );
 }
 
@@ -74,45 +67,107 @@ export function FilterTabs<T extends string>({
   accentColors,
 }: FilterTabsProps<T>) {
   const defaultAccent = { color: "#FFFFFF", bg: "#FFFFFF14" };
+  const allFilters: (T | null)[] = [null, ...filters];
+
+  const layouts = useRef<Map<number, TabLayout>>(new Map());
+  const [ready, setReady] = useState(false);
+
+  const lineX = useSharedValue(0);
+  const lineWidth = useSharedValue(0);
+  const lineColor = useSharedValue(defaultAccent.color);
+
+  const activeIndex = allFilters.indexOf(activeFilter);
+
+  const moveLine = useCallback(
+    (index: number) => {
+      const layout = layouts.current.get(index);
+      if (!layout) return;
+      lineX.value = withSpring(layout.x, SPRING_CONFIG);
+      lineWidth.value = withSpring(layout.width, SPRING_CONFIG);
+    },
+    [lineX, lineWidth],
+  );
+
+  const handleLayout = useCallback(
+    (index: number) => (e: LayoutChangeEvent) => {
+      const { x, width } = e.nativeEvent.layout;
+      layouts.current.set(index, { x, width });
+
+      if (layouts.current.size === allFilters.length && !ready) {
+        const target = activeIndex >= 0 ? activeIndex : 0;
+        const active = layouts.current.get(target);
+        if (active) {
+          lineX.value = active.x;
+          lineWidth.value = active.width;
+          setReady(true);
+        }
+      }
+    },
+    [allFilters.length, activeIndex, ready, lineX, lineWidth],
+  );
+
+  const handlePress = useCallback(
+    (filter: T | null, index: number) => {
+      onFilterChange(filter);
+      moveLine(index);
+
+      if (filter === null) {
+        lineColor.value = withTiming(defaultAccent.color, { duration: 150 });
+      } else {
+        const accent = accentColors?.[filter];
+        lineColor.value = withTiming(accent?.color ?? defaultAccent.color, { duration: 150 });
+      }
+    },
+    [onFilterChange, moveLine, lineColor, accentColors, defaultAccent.color],
+  );
+
+  const underlineStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: lineX.value }],
+    width: lineWidth.value,
+    backgroundColor: lineColor.value,
+    opacity: ready ? 1 : 0,
+  }));
 
   return (
-    <View style={styles.row}>
-      <FilterTab
-        label="All"
-        isActive={activeFilter === null}
-        color={defaultAccent.color}
-        bg={defaultAccent.bg}
-        onPress={() => onFilterChange(null)}
-      />
-      {filters.map((filter) => {
-        const accent = accentColors?.[filter];
-        return (
-          <FilterTab
-            key={filter}
-            label={filter}
-            isActive={activeFilter === filter}
-            color={accent?.color ?? defaultAccent.color}
-            bg={accent?.bg ?? defaultAccent.bg}
-            onPress={() => onFilterChange(filter)}
-          />
-        );
-      })}
+    <View style={styles.container}>
+      <View style={styles.row}>
+        {allFilters.map((filter, index) => {
+          const accent = filter !== null ? accentColors?.[filter] : undefined;
+
+          return (
+            <FilterTab
+              key={filter ?? "all"}
+              label={filter ?? "All"}
+              isActive={filter === activeFilter}
+              color={accent?.color ?? defaultAccent.color}
+              onPress={() => handlePress(filter, index)}
+              onLayout={handleLayout(index)}
+            />
+          );
+        })}
+      </View>
+      <Animated.View style={[styles.underline, underlineStyle]} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    gap: 4,
+  },
   row: {
     flexDirection: "row",
-    gap: 28,
+    alignItems: "center",
+    gap: 24,
   },
-  tab: {
-    paddingVertical: 7,
-    borderRadius: 20,
+  underline: {
+    height: UNDERLINE_HEIGHT,
+    borderRadius: UNDERLINE_HEIGHT / 2,
   },
   tabText: {
     fontSize: 14,
     fontWeight: "600",
     letterSpacing: -0.2,
+    paddingVertical: 7,
   },
 });
