@@ -23,8 +23,8 @@ export function HomeHeader({ profilePicture, balance, onBalancePress }: HomeHead
   return (
     <View style={styles.wrapper}>
       <LinearGradient
-        colors={["#0F0F10", "#0F0F10CC", "#0F0F1066", "#0F0F1000"]}
-        locations={[0, 0.35, 0.7, 1]}
+        colors={["#0F0F10", "#0F0F10EE", "#0F0F10AA", "#0F0F1055", "#0F0F1000"]}
+        locations={[0, 0.3, 0.55, 0.8, 1]}
         style={styles.gradient}
       />
       <View style={styles.container}>
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    bottom: -60,
+    bottom: -100,
   },
   container: {
     flexDirection: "row",
@@ -83,8 +83,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#1C1C1E",
   },
   title: {
-    fontSize: 30,
-    fontWeight: "700",
+    fontSize: 24,
+    fontWeight: "600",
     color: theme.colors.foreground,
   },
   balanceButton: {
