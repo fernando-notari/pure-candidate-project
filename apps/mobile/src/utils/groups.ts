@@ -39,3 +39,7 @@ export const defaultGroupColors: GroupCardColors = {
   circle: ["#444444", "#1A1A1A"],
   initialsColor: "rgba(255, 255, 255, 0.6)",
 };
+
+export function getGroupColors(colorKey: string): GroupCardColors {
+  return groupCardColors[colorKey] ?? defaultGroupColors;
+}
