@@ -29,10 +29,10 @@ export function HomeSection({ title, headerAccessory, children }: HomeSectionPro
 
 const styles = StyleSheet.create({
     container: {
-        gap: 20,
+        gap: 14,
     },
     headerBlock: {
-        gap: 16,
+        gap: 10,
     },
     header: {
         flexDirection: "row",

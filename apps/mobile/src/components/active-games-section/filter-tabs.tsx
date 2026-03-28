@@ -153,7 +153,7 @@ export function FilterTabs<T extends string>({
 
 const styles = StyleSheet.create({
   container: {
-    gap: 4,
+    gap: 2,
   },
   row: {
     flexDirection: "row",
