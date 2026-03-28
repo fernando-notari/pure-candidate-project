@@ -30,7 +30,9 @@ export function HomeHeader({ profilePicture, balance, onBalancePress }: HomeHead
         </View>
         <Pressable onPress={onBalancePress}>
           <LiquidGlassView style={styles.balanceButton} colorScheme="dark">
-            <WalletIcon size={18} color={theme.colors.foreground} />
+            <View style={{ marginTop: 2 }}>
+              <WalletIcon size={22} color={theme.colors.foreground} />
+            </View>
             <Text style={styles.balanceText}>{formatBalance(balance)}</Text>
           </LiquidGlassView>
         </Pressable>
