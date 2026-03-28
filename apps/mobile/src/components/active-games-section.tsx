@@ -246,14 +246,6 @@ export function ActiveGamesSection({ gamemodeFilters }: ActiveGamesSectionProps)
     return new Set(friends.map((f) => f.id));
   }, [friends]);
 
-  if (isLoading) {
-    return <ActiveGamesSkeleton />;
-  }
-
-  if (isError) {
-    return <ErrorState onRetry={() => refetchGames()} />;
-  }
-
   // TODO: Filtering is done client-side; should be handled server-side via the game.getAll route
   const filteredGames = useMemo(() => {
     if (!games) return [];
@@ -263,6 +255,14 @@ export function ActiveGamesSection({ gamemodeFilters }: ActiveGamesSectionProps)
     );
     return games.filter((g) => modes.has(g.gamemode));
   }, [games, gamemodeFilters]);
+
+  if (isLoading) {
+    return <ActiveGamesSkeleton />;
+  }
+
+  if (isError) {
+    return <ErrorState onRetry={() => refetchGames()} />;
+  }
 
   if (!games || filteredGames.length === 0) {
     return <Text style={styles.emptyText}>No active games</Text>;
