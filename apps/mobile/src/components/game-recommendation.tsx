@@ -43,7 +43,7 @@ export function GameRecommendation({
           </View>
         </View>
         <TouchableOpacity onPress={onJoin} activeOpacity={0.7} style={styles.buttonWrapper}>
-          <LiquidGlassView style={styles.button}>
+          <LiquidGlassView style={styles.button} colorScheme="dark">
             <Text style={styles.buttonText}>Join game</Text>
           </LiquidGlassView>
         </TouchableOpacity>

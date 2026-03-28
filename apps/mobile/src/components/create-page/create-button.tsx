@@ -12,7 +12,7 @@ export function CreateButton({ onPress }: CreateButtonProps) {
     <View style={styles.container}>
       <Text style={styles.label}>Tap to create</Text>
       <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
-        <LiquidGlassView style={styles.button}>
+        <LiquidGlassView style={styles.button} colorScheme="dark">
           <PlusIcon size={24} color={theme.colors.foreground} />
         </LiquidGlassView>
       </TouchableOpacity>

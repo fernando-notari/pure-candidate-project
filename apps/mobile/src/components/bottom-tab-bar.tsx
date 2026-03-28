@@ -37,7 +37,7 @@ export function BottomTabBar({ activeTab, onTabChange }: BottomTabBarProps) {
           if (isCenter) {
             return (
               <TouchableOpacity key="center" style={styles.centerWrapper}>
-                <LiquidGlassView style={styles.centerButton}>
+                <LiquidGlassView style={styles.centerButton} colorScheme="dark">
                   {tab.icon(false)}
                 </LiquidGlassView>
               </TouchableOpacity>
