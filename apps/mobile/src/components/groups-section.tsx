@@ -10,11 +10,11 @@ import { theme } from "../theme";
 import { api } from "../trpc";
 import { ErrorState } from "./error-state";
 import { Skeleton } from "./skeleton";
-import {
-  getGroupInitials,
-  getGroupColors,
-} from "../utils/groups";
-import { formatMemberCount } from "../utils/format";
+import { getGroupInitials, getGroupColors } from "../utils/groups";
+
+function formatMemberCount(count: number): string {
+  return `${count.toLocaleString()} members`;
+}
 
 function GroupsSkeleton() {
   return (
@@ -28,8 +28,18 @@ function GroupsSkeleton() {
         <View key={i} style={styles.card}>
           <Skeleton width={119} height={119} borderRadius={16} />
           <View style={styles.cardText}>
-            <Skeleton width={96} height={12} borderRadius={6} style={{ marginLeft: 4 }} />
-            <Skeleton width={72} height={10} borderRadius={5} style={{ marginLeft: 4 }} />
+            <Skeleton
+              width={96}
+              height={12}
+              borderRadius={6}
+              style={{ marginLeft: 4 }}
+            />
+            <Skeleton
+              width={72}
+              height={10}
+              borderRadius={5}
+              style={{ marginLeft: 4 }}
+            />
           </View>
         </View>
       ))}
@@ -50,7 +60,9 @@ export function GroupsSection() {
   }
 
   if (isError) {
-    return <ErrorState message="Failed to load groups" onRetry={() => refetch()} />;
+    return (
+      <ErrorState message="Failed to load groups" onRetry={() => refetch()} />
+    );
   }
 
   if (!groups || groups.length === 0) {
@@ -78,7 +90,16 @@ export function GroupsSection() {
               end={{ x: 1, y: 1 }}
               style={styles.cardCircle}
             >
-              <Text style={[styles.cardInitials, { color: getGroupColors(group.backgroundColor).initialsColor }]}>{getGroupInitials(group.name)}</Text>
+              <Text
+                style={[
+                  styles.cardInitials,
+                  {
+                    color: getGroupColors(group.backgroundColor).initialsColor,
+                  },
+                ]}
+              >
+                {getGroupInitials(group.name)}
+              </Text>
             </LinearGradient>
           </LinearGradient>
           <View style={styles.cardText}>

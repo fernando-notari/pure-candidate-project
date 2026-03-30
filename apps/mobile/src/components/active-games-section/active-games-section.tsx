@@ -27,11 +27,8 @@ import { theme } from "../../theme";
 import { api } from "../../trpc";
 import { ErrorState } from "../error-state";
 import { Skeleton } from "../skeleton";
-import {
-  getGroupInitials,
-  getGroupColors,
-} from "../../utils/groups";
-import { darkenColor, formatBlind, getStakes } from "../../utils/format";
+import { getGroupInitials, getGroupColors } from "../../utils/groups";
+import { getStakes } from "../../utils/format";
 import { CURRENT_USER_ID } from "../../constants";
 
 import aceOfSpades from "../../../assets/playing-cards/a-spade.png";
@@ -50,6 +47,14 @@ const gameAccentColors: Record<string, string> = {
 };
 
 const DARKEN_FACTOR = 0.3;
+
+function darkenColor(hex: string, factor: number): string {
+  const raw = hex.replace("#", "").slice(0, 6);
+  const r = Math.round(parseInt(raw.slice(0, 2), 16) * factor);
+  const g = Math.round(parseInt(raw.slice(2, 4), 16) * factor);
+  const b = Math.round(parseInt(raw.slice(4, 6), 16) * factor);
+  return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+}
 
 function getCardColors(gamemode: string): CardColors {
   const accent = gameAccentColors[gamemode] ?? "#282828";
@@ -203,10 +208,38 @@ function ActiveGamesSkeleton() {
 }
 
 const EMPTY_CARDS = [
-  { source: aceOfClover, rotate: "-9deg", marginTop: 4, drift: 1.2, duration: 3600, delay: 0 },
-  { source: jackOfDiamonds, rotate: "4deg", marginTop: -6, drift: 1, duration: 4000, delay: 500 },
-  { source: kingOfSpades, rotate: "-3deg", marginTop: 8, drift: 1.4, duration: 3800, delay: 250 },
-  { source: queenOfHearts, rotate: "10deg", marginTop: -2, drift: 0.8, duration: 4200, delay: 750 },
+  {
+    source: aceOfClover,
+    rotate: "-9deg",
+    marginTop: 4,
+    drift: 1.2,
+    duration: 3600,
+    delay: 0,
+  },
+  {
+    source: jackOfDiamonds,
+    rotate: "4deg",
+    marginTop: -6,
+    drift: 1,
+    duration: 4000,
+    delay: 500,
+  },
+  {
+    source: kingOfSpades,
+    rotate: "-3deg",
+    marginTop: 8,
+    drift: 1.4,
+    duration: 3800,
+    delay: 250,
+  },
+  {
+    source: queenOfHearts,
+    rotate: "10deg",
+    marginTop: -2,
+    drift: 0.8,
+    duration: 4200,
+    delay: 750,
+  },
 ];
 
 function FloatingCard({
@@ -224,8 +257,14 @@ function FloatingCard({
       delay,
       withRepeat(
         withSequence(
-          withTiming(-drift, { duration: duration / 2, easing: Easing.inOut(Easing.sin) }),
-          withTiming(drift, { duration: duration / 2, easing: Easing.inOut(Easing.sin) }),
+          withTiming(-drift, {
+            duration: duration / 2,
+            easing: Easing.inOut(Easing.sin),
+          }),
+          withTiming(drift, {
+            duration: duration / 2,
+            easing: Easing.inOut(Easing.sin),
+          }),
         ),
         -1,
         true,
@@ -355,7 +394,12 @@ export function ActiveGamesSection({
   if (isLoading) {
     content = <ActiveGamesSkeleton />;
   } else if (isError) {
-    content = <ErrorState message="Failed to load games" onRetry={() => refetchGames()} />;
+    content = (
+      <ErrorState
+        message="Failed to load games"
+        onRetry={() => refetchGames()}
+      />
+    );
   } else if (!games || filteredGames.length === 0) {
     content = <EmptyState isFiltered={!!hasActiveFilters} />;
   } else {
@@ -369,8 +413,7 @@ export function ActiveGamesSection({
       >
         {filteredGames.map((game) => {
           const group = groupMap[game.groupId];
-          const colors =
-            getCardColors(game.gamemode);
+          const colors = getCardColors(game.gamemode);
           const filledSeats = game.seats - game.seatsAvailable;
           const friendsInGame = game.players.filter((playerId) =>
             friendIds.has(String(playerId)),
@@ -390,7 +433,7 @@ export function ActiveGamesSection({
                       <Text style={styles.gameMode}>{game.gamemode}</Text>
                       <Text style={styles.stakes}>
                         {getStakes(game.bigBlind).sb}
-                        <Text style={styles.stakesSlash}>  /  </Text>
+                        <Text style={styles.stakesSlash}> / </Text>
                         {getStakes(game.bigBlind).bb}
                       </Text>
                     </View>
@@ -398,12 +441,22 @@ export function ActiveGamesSection({
                       {group && (
                         <View style={styles.footerRow}>
                           <LinearGradient
-                            colors={getGroupColors(group.backgroundColor).circle}
+                            colors={
+                              getGroupColors(group.backgroundColor).circle
+                            }
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 1 }}
                             style={styles.groupIcon}
                           >
-                            <Text style={[styles.groupIconInitials, { color: getGroupColors(group.backgroundColor).initialsColor }]}>
+                            <Text
+                              style={[
+                                styles.groupIconInitials,
+                                {
+                                  color: getGroupColors(group.backgroundColor)
+                                    .initialsColor,
+                                },
+                              ]}
+                            >
                               {getGroupInitials(group.name)}
                             </Text>
                           </LinearGradient>
