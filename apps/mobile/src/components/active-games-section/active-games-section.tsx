@@ -1,5 +1,5 @@
 import { LinearGradient } from "expo-linear-gradient";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useCallback } from "react";
 import {
   Image,
   ScrollView,
@@ -8,6 +8,15 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withSequence,
+  withTiming,
+  withDelay,
+  Easing,
+} from "react-native-reanimated";
 import Svg, {
   Circle,
   Defs,
@@ -50,7 +59,7 @@ type SeatIndicatorProps = {
   filledSeats: number;
   totalSeats: number;
   progressColor?: string;
-  bgColors?: [string, string];
+  bgColors: [string, string];
 };
 
 const RING_SIZE = 65;
@@ -63,7 +72,7 @@ function SeatIndicator({
   filledSeats,
   totalSeats,
   progressColor = "#007CFF",
-  bgColors = ["#0A0A0A", "#253358"],
+  bgColors,
 }: SeatIndicatorProps) {
   const progress = filledSeats / totalSeats;
   const dashOffset = RING_CIRCUMFERENCE * (1 - progress);
@@ -186,28 +195,54 @@ function ActiveGamesSkeleton() {
 }
 
 const EMPTY_CARDS = [
-  { source: aceOfClover, rotate: "-9deg", marginTop: 4 },
-  { source: jackOfDiamonds, rotate: "4deg", marginTop: -6 },
-  { source: kingOfSpades, rotate: "-3deg", marginTop: 8 },
-  { source: queenOfHearts, rotate: "10deg", marginTop: -2 },
+  { source: aceOfClover, rotate: "-9deg", marginTop: 4, drift: 1.2, duration: 3600, delay: 0 },
+  { source: jackOfDiamonds, rotate: "4deg", marginTop: -6, drift: 1, duration: 4000, delay: 500 },
+  { source: kingOfSpades, rotate: "-3deg", marginTop: 8, drift: 1.4, duration: 3800, delay: 250 },
+  { source: queenOfHearts, rotate: "10deg", marginTop: -2, drift: 0.8, duration: 4200, delay: 750 },
 ];
+
+function FloatingCard({
+  source,
+  rotate,
+  marginTop,
+  drift,
+  duration,
+  delay,
+}: (typeof EMPTY_CARDS)[number]) {
+  const translateY = useSharedValue(0);
+
+  useEffect(() => {
+    translateY.value = withDelay(
+      delay,
+      withRepeat(
+        withSequence(
+          withTiming(-drift, { duration: duration / 2, easing: Easing.inOut(Easing.sin) }),
+          withTiming(drift, { duration: duration / 2, easing: Easing.inOut(Easing.sin) }),
+        ),
+        -1,
+        true,
+      ),
+    );
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate }, { translateY: translateY.value }],
+  }));
+
+  return (
+    <Animated.Image
+      source={source}
+      style={[emptyStyles.card, { marginTop }, animatedStyle]}
+    />
+  );
+}
 
 function EmptyState({ isFiltered }: { isFiltered: boolean }) {
   return (
     <View style={emptyStyles.container}>
       <View style={emptyStyles.cardsRow}>
         {EMPTY_CARDS.map((card, i) => (
-          <Image
-            key={i}
-            source={card.source}
-            style={[
-              emptyStyles.card,
-              {
-                marginTop: card.marginTop,
-                transform: [{ rotate: card.rotate }],
-              },
-            ]}
-          />
+          <FloatingCard key={i} {...card} />
         ))}
       </View>
       <Text style={emptyStyles.title}>
@@ -221,7 +256,7 @@ const emptyStyles = StyleSheet.create({
   container: {
     alignItems: "center",
     justifyContent: "center",
-    height: 170.5,
+    flex: 1,
     gap: 16,
   },
   cardsRow: {
@@ -254,6 +289,11 @@ type ActiveGamesSectionProps = {
 export function ActiveGamesSection({
   gamemodeFilters,
 }: ActiveGamesSectionProps) {
+  const scrollRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ x: 0, animated: true });
+  }, [gamemodeFilters]);
   const {
     data: games,
     isLoading: gamesLoading,
@@ -300,110 +340,110 @@ export function ActiveGamesSection({
     return games.filter((g) => modes.has(g.gamemode));
   }, [games, gamemodeFilters]);
 
-  if (isLoading) {
-    return <ActiveGamesSkeleton />;
-  }
-
-  if (isError) {
-    return <ErrorState message="Failed to load games" onRetry={() => refetchGames()} />;
-  }
-
   const hasActiveFilters = gamemodeFilters && gamemodeFilters.size > 0;
 
-  if (!games || filteredGames.length === 0) {
-    return <EmptyState isFiltered={!!hasActiveFilters} />;
-  }
+  let content;
 
-  return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      style={styles.scrollView}
-      contentContainerStyle={styles.row}
-    >
-      {filteredGames.map((game) => {
-        const group = groupMap[game.groupId];
-        const colors =
-          getCardColors(game.gamemode);
-        const filledSeats = game.seats - game.seatsAvailable;
-        const friendsInGame = game.players.filter((playerId) =>
-          friendIds.has(String(playerId)),
-        ).length;
+  if (isLoading) {
+    content = <ActiveGamesSkeleton />;
+  } else if (isError) {
+    content = <ErrorState message="Failed to load games" onRetry={() => refetchGames()} />;
+  } else if (!games || filteredGames.length === 0) {
+    content = <EmptyState isFiltered={!!hasActiveFilters} />;
+  } else {
+    content = (
+      <ScrollView
+        ref={scrollRef}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.scrollView}
+        contentContainerStyle={styles.row}
+      >
+        {filteredGames.map((game) => {
+          const group = groupMap[game.groupId];
+          const colors =
+            getCardColors(game.gamemode);
+          const filledSeats = game.seats - game.seatsAvailable;
+          const friendsInGame = game.players.filter((playerId) =>
+            friendIds.has(String(playerId)),
+          ).length;
 
-        return (
-          <TouchableOpacity key={game.id} style={styles.cardWrapper}>
-            <LinearGradient
-              colors={colors}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 0, y: 1 }}
-              style={styles.card}
-            >
-              <View style={styles.cardColumns}>
-                <View style={styles.cardLeft}>
-                  <View style={styles.gameInfo}>
-                    <Text style={styles.gameMode}>{game.gamemode}</Text>
-                    <Text style={styles.stakes}>
-                      {getStakes(game.bigBlind).sb}
-                      <Text style={styles.stakesSlash}>  /  </Text>
-                      {getStakes(game.bigBlind).bb}
-                    </Text>
-                  </View>
-                  <View style={styles.cardFooter}>
-                    {group && (
-                      <View style={styles.footerRow}>
-                        <LinearGradient
-                          colors={getGroupColors(group.backgroundColor).circle}
-                          start={{ x: 0, y: 0 }}
-                          end={{ x: 1, y: 1 }}
-                          style={styles.groupIcon}
-                        >
-                          <Text style={[styles.groupIconInitials, { color: getGroupColors(group.backgroundColor).initialsColor }]}>
-                            {getGroupInitials(group.name)}
-                          </Text>
-                        </LinearGradient>
-                        <Text style={styles.footerLabel} numberOfLines={1}>
-                          {group.name}
-                        </Text>
-                      </View>
-                    )}
-                    {friendsInGame > 0 && (
-                      <View style={styles.footerRow}>
-                        <View style={styles.friendsCircle}>
-                          <Text style={styles.friendsCircleText}>
-                            {friendsInGame}
+          return (
+            <TouchableOpacity key={game.id} style={styles.cardWrapper}>
+              <LinearGradient
+                colors={colors}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0, y: 1 }}
+                style={styles.card}
+              >
+                <View style={styles.cardColumns}>
+                  <View style={styles.cardLeft}>
+                    <View style={styles.gameInfo}>
+                      <Text style={styles.gameMode}>{game.gamemode}</Text>
+                      <Text style={styles.stakes}>
+                        {getStakes(game.bigBlind).sb}
+                        <Text style={styles.stakesSlash}>  /  </Text>
+                        {getStakes(game.bigBlind).bb}
+                      </Text>
+                    </View>
+                    <View style={styles.cardFooter}>
+                      {group && (
+                        <View style={styles.footerRow}>
+                          <LinearGradient
+                            colors={getGroupColors(group.backgroundColor).circle}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
+                            style={styles.groupIcon}
+                          >
+                            <Text style={[styles.groupIconInitials, { color: getGroupColors(group.backgroundColor).initialsColor }]}>
+                              {getGroupInitials(group.name)}
+                            </Text>
+                          </LinearGradient>
+                          <Text style={styles.footerLabel} numberOfLines={1}>
+                            {group.name}
                           </Text>
                         </View>
-                        <Text style={styles.footerLabel}>
-                          {friendsInGame === 1 ? "Friend" : "Friends"} playing
-                        </Text>
-                      </View>
-                    )}
+                      )}
+                      {friendsInGame > 0 && (
+                        <View style={styles.footerRow}>
+                          <View style={styles.friendsCircle}>
+                            <Text style={styles.friendsCircleText}>
+                              {friendsInGame}
+                            </Text>
+                          </View>
+                          <Text style={styles.footerLabel}>
+                            {friendsInGame === 1 ? "Friend" : "Friends"} playing
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                  </View>
+                  <View style={styles.seatIndicator}>
+                    <SeatIndicator
+                      filledSeats={filledSeats}
+                      totalSeats={game.seats}
+                      progressColor={
+                        game.gamemode === "PLO4" ? "#CC3333" : "#007CFF"
+                      }
+                      bgColors={colors}
+                    />
                   </View>
                 </View>
-                <View style={styles.seatIndicator}>
-                  <SeatIndicator
-                    filledSeats={filledSeats}
-                    totalSeats={game.seats}
-                    progressColor={
-                      game.gamemode === "PLO4" ? "#CC3333" : "#007CFF"
-                    }
-                    bgColors={
-                      game.gamemode === "PLO4"
-                        ? ["#0A0A0A", "#6F282ADB"]
-                        : undefined
-                    }
-                  />
-                </View>
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-        );
-      })}
-    </ScrollView>
-  );
+              </LinearGradient>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+    );
+  }
+
+  return <View style={styles.sectionContainer}>{content}</View>;
 }
 
 const styles = StyleSheet.create({
+  sectionContainer: {
+    height: 180,
+  },
   scrollView: {
     marginHorizontal: -20,
   },
