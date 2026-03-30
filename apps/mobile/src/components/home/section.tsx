@@ -9,7 +9,11 @@ type HomeSectionProps = {
     children: ReactNode;
 };
 
-export function HomeSection({ title, headerAccessory, children }: HomeSectionProps) {
+export function HomeSection({
+    title,
+    headerAccessory,
+    children,
+}: HomeSectionProps) {
     return (
         <View style={styles.container}>
             <View style={styles.headerBlock}>

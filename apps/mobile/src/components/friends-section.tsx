@@ -1,10 +1,17 @@
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { PlusIcon } from "./icons";
-import { ErrorState } from "./error-state";
-import { Skeleton } from "./skeleton";
+import {
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
 import { theme } from "../theme";
 import { api } from "../trpc";
 import { getProfilePicture } from "../utils/profile-pictures";
+import { ErrorState } from "./error-state";
+import { PlusIcon } from "./icons";
+import { Skeleton } from "./skeleton";
 
 type FriendsSectionProps = {
     userId: string;
@@ -29,24 +36,37 @@ function FriendsSkeleton() {
 }
 
 export function FriendsSection({ userId }: FriendsSectionProps) {
-    const { data: friends, isLoading, isError, refetch } = api.friendship.getByUserId.useQuery({ userId });
+    const {
+        data: friends,
+        isLoading,
+        isError,
+        refetch,
+    } = api.friendship.getByUserId.useQuery({ userId });
 
     if (isLoading) {
         return <FriendsSkeleton />;
     }
 
     if (isError) {
-        return <ErrorState message="Failed to load friends" onRetry={() => refetch()} />;
-    }
-
-    if (!friends || friends.length === 0) {
         return (
-            <Text style={styles.emptyText}>No friends yet</Text>
+            <ErrorState
+                message="Failed to load friends"
+                onRetry={() => refetch()}
+            />
         );
     }
 
+    if (!friends || friends.length === 0) {
+        return <Text style={styles.emptyText}>No friends yet</Text>;
+    }
+
     return (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView} contentContainerStyle={styles.row}>
+        <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.scrollView}
+            contentContainerStyle={styles.row}
+        >
             {friends.map((friend) => (
                 <TouchableOpacity key={friend.id} style={styles.item}>
                     <View style={styles.avatarContainer}>
@@ -56,7 +76,11 @@ export function FriendsSection({ userId }: FriendsSectionProps) {
                         />
                         <View style={styles.onlineDot} />
                     </View>
-                    <Text style={styles.username} numberOfLines={1} ellipsizeMode="tail">
+                    <Text
+                        style={styles.username}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                    >
                         {friend.username}
                     </Text>
                 </TouchableOpacity>

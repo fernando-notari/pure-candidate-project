@@ -1,26 +1,23 @@
 {
-  "name": "pure-candidate-assignment",
-  "version": "1.0.0",
-  "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
-  "scripts": {
-    "dev:backend": "npm run dev --workspace=pure-backend",
-    "dev:mobile": "npm run start --workspace=mobile",
-    "format": "biome format --write .",
-    "lint": "biome lint --write .",
-    "check": "biome check --write ."
-  },
-  "overrides": {
-    "react": "19.1.0",
-    "react-native": "0.81.5"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "^1.9.4"
-  },
-  "dependencies": {
-    "react-native-safe-area-context": "~5.6.0"
-  }
+    "name": "pure-candidate-assignment",
+    "version": "1.0.0",
+    "private": true,
+    "workspaces": ["apps/*", "packages/*"],
+    "scripts": {
+        "dev:backend": "npm run dev --workspace=pure-backend",
+        "dev:mobile": "npm run start --workspace=mobile",
+        "format": "biome format --write .",
+        "lint": "biome lint --write .",
+        "check": "biome check --write ."
+    },
+    "overrides": {
+        "react": "19.1.0",
+        "react-native": "0.81.5"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "^1.9.4"
+    },
+    "dependencies": {
+        "react-native-safe-area-context": "~5.6.0"
+    }
 }
