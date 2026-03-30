@@ -168,6 +168,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     letterSpacing: -0.2,
-    paddingVertical: 7,
+    paddingTop: 7,
+    paddingBottom: 3,
   },
 });
