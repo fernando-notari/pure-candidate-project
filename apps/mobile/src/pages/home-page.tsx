@@ -1,6 +1,6 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useCallback, useState } from "react";
-import { Dimensions, RefreshControl, StyleSheet, View } from "react-native";
+import { Dimensions, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useQueryClient } from "@tanstack/react-query";
 import Animated, { interpolate, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { ActiveGamesSection } from "../components/active-games-section/active-games-section";
@@ -15,6 +15,7 @@ import { HomeCarousel } from "../components/home/carousel";
 import { HomeHeader } from "../components/home/header";
 import { RefreshIndicator } from "../components/home/refresh-indicator";
 import { HomeSection } from "../components/home/section";
+import { GlassButton } from "../components/glass-button";
 import { api } from "../trpc";
 import { getProfilePicture } from "../utils/profile-pictures";
 import { CURRENT_USER_ID } from "../constants";
@@ -147,6 +148,11 @@ export function HomePage() {
         </View>
       </Animated.ScrollView>
       <RefreshIndicator scrollY={scrollY} refreshing={refreshing} />
+      <TouchableOpacity style={styles.pillWrapper} activeOpacity={0.7}>
+        <GlassButton style={styles.pill}>
+          <Text style={styles.pillText}>Get $20</Text>
+        </GlassButton>
+      </TouchableOpacity>
       <HomeHeader
         profilePicture={currentUser?.profilePicture ?? ""}
         // TODO: No endpoint for user balance yet, using placeholder
@@ -177,5 +183,20 @@ const styles = StyleSheet.create({
     gap: 39,
     paddingTop: 39,
     paddingHorizontal: 20,
+  },
+  pillWrapper: {
+    position: "absolute",
+    bottom: 16,
+    right: 20,
+  },
+  pill: {
+    paddingVertical: 14,
+    paddingHorizontal: 26,
+    borderRadius: 24,
+  },
+  pillText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#FFFFFF",
   },
 });
