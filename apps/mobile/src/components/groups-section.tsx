@@ -9,6 +9,7 @@ import {
 import { theme } from "../theme";
 import { api } from "../trpc";
 import { ErrorState } from "./error-state";
+import { Skeleton } from "./skeleton";
 import {
   getGroupInitials,
   getGroupColors,
@@ -17,15 +18,22 @@ import { formatMemberCount } from "../utils/format";
 
 function GroupsSkeleton() {
   return (
-    <View style={styles.row}>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      style={styles.scrollView}
+      contentContainerStyle={styles.row}
+    >
       {[1, 2, 3].map((i) => (
-        <View key={i} style={styles.skeletonCard}>
-          <View style={[styles.skeleton, styles.skeletonSquare]} />
-          <View style={[styles.skeleton, styles.skeletonName]} />
-          <View style={[styles.skeleton, styles.skeletonMembers]} />
+        <View key={i} style={styles.card}>
+          <Skeleton width={119} height={119} borderRadius={16} />
+          <View style={styles.cardText}>
+            <Skeleton width={96} height={12} borderRadius={6} style={{ marginLeft: 4 }} />
+            <Skeleton width={72} height={10} borderRadius={5} style={{ marginLeft: 4 }} />
+          </View>
         </View>
       ))}
-    </View>
+    </ScrollView>
   );
 }
 
@@ -137,27 +145,6 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     color: theme.colors.muted,
     paddingLeft: 4,
-  },
-  skeletonCard: {
-    gap: 8,
-  },
-  skeleton: {
-    backgroundColor: theme.colors.surface,
-  },
-  skeletonSquare: {
-    width: 119,
-    height: 119,
-    borderRadius: 16,
-  },
-  skeletonName: {
-    width: 96,
-    height: 12,
-    borderRadius: 6,
-  },
-  skeletonMembers: {
-    width: 72,
-    height: 10,
-    borderRadius: 5,
   },
   emptyText: {
     fontSize: 14,

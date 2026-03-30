@@ -26,6 +26,7 @@ import Svg, {
 import { theme } from "../../theme";
 import { api } from "../../trpc";
 import { ErrorState } from "../error-state";
+import { Skeleton } from "../skeleton";
 import {
   getGroupInitials,
   getGroupColors,
@@ -186,11 +187,18 @@ const seatStyles = StyleSheet.create({
 
 function ActiveGamesSkeleton() {
   return (
-    <View style={styles.row}>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      style={styles.scrollView}
+      contentContainerStyle={styles.row}
+    >
       {[1, 2].map((i) => (
-        <View key={i} style={styles.skeletonCard} />
+        <View key={i} style={styles.skeletonCardContainer}>
+          <Skeleton width={250} height={160} borderRadius={16} />
+        </View>
       ))}
-    </View>
+    </ScrollView>
   );
 }
 
@@ -532,10 +540,7 @@ const styles = StyleSheet.create({
     color: "rgba(255, 255, 255, 0.5)",
     flexShrink: 1,
   },
-  skeletonCard: {
-    width: 200,
-    height: 180,
-    borderRadius: 16,
-    backgroundColor: theme.colors.surface,
+  skeletonCardContainer: {
+    overflow: "visible",
   },
 });

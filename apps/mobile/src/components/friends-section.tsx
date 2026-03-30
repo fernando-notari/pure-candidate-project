@@ -1,6 +1,7 @@
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { PlusIcon } from "./icons";
 import { ErrorState } from "./error-state";
+import { Skeleton } from "./skeleton";
 import { theme } from "../theme";
 import { api } from "../trpc";
 import { getProfilePicture } from "../utils/profile-pictures";
@@ -11,14 +12,19 @@ type FriendsSectionProps = {
 
 function FriendsSkeleton() {
     return (
-        <View style={styles.row}>
-            {[1, 2, 3, 4].map((i) => (
+        <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.scrollView}
+            contentContainerStyle={styles.row}
+        >
+            {[1, 2, 3, 4, 5].map((i) => (
                 <View key={i} style={styles.item}>
-                    <View style={[styles.skeleton, styles.skeletonAvatar]} />
-                    <View style={[styles.skeleton, styles.skeletonLabel]} />
+                    <Skeleton width={65} height={65} borderRadius={33} />
+                    <Skeleton width={56} height={12} borderRadius={6} />
                 </View>
             ))}
-        </View>
+        </ScrollView>
     );
 }
 
@@ -112,19 +118,6 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.surface,
         alignItems: "center",
         justifyContent: "center",
-    },
-    skeleton: {
-        backgroundColor: theme.colors.surface,
-    },
-    skeletonAvatar: {
-        width: 65,
-        height: 65,
-        borderRadius: 33,
-    },
-    skeletonLabel: {
-        width: 56,
-        height: 12,
-        borderRadius: 6,
     },
     emptyText: {
         fontSize: 14,
