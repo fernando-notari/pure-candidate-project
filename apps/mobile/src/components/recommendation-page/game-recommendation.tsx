@@ -30,13 +30,19 @@ export function GameRecommendation({
       )}
       <View style={styles.bottom}>
         <View style={styles.content}>
-          <Text style={styles.stakes}>{stakes}</Text>
+          <Text style={styles.stakes}>
+            {stakes.split("/").map((part, i, arr) => (
+              <Text key={i}>
+                {part}{i < arr.length - 1 && <Text style={styles.stakesSlash}> / </Text>}
+              </Text>
+            ))}
+          </Text>
           <Text style={styles.gameMode}>{gameMode}</Text>
           <View style={styles.statsRow}>
             <Text style={styles.statText}>
               <Text style={styles.statNumber}>{seatsOpen}</Text> {seatLabel} open
             </Text>
-            <Text style={styles.statSeparator}>/</Text>
+            <Text style={styles.statSeparator}>•</Text>
             <Text style={styles.statText}>
               <Text style={styles.statNumber}>{friendsCount}</Text> {friendLabel}
             </Text>
@@ -74,6 +80,10 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: theme.colors.muted,
     letterSpacing: 0.3,
+  },
+  stakesSlash: {
+    color: "rgba(255, 255, 255, 0.35)",
+    fontWeight: "300",
   },
   gameMode: {
     fontSize: 30,
