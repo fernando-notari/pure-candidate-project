@@ -1,4 +1,4 @@
-import { LiquidGlassView } from "@callstack/liquid-glass";
+import { GlassButton } from "../glass-button";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { theme } from "../../theme";
 import { ActionChipsTicker, type ActionChipData } from "./action-chips-ticker";
@@ -43,9 +43,9 @@ export function GameRecommendation({
           </View>
         </View>
         <TouchableOpacity onPress={onJoin} activeOpacity={0.7} style={styles.buttonWrapper}>
-          <LiquidGlassView style={styles.button} colorScheme="dark">
+          <GlassButton style={styles.button}>
             <Text style={styles.buttonText}>Join game</Text>
-          </LiquidGlassView>
+          </GlassButton>
         </TouchableOpacity>
       </View>
     </View>

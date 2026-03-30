@@ -1,8 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import {
-  LiquidGlassContainerView,
-  LiquidGlassView,
-} from "@callstack/liquid-glass";
+import { LiquidGlassContainerView } from "@callstack/liquid-glass";
+import { GlassButton } from "./glass-button";
 import { theme } from "../theme";
 import { BellIcon, GlobeIcon, HomeIcon, PeopleIcon, PlusIcon } from "./icons";
 
@@ -37,9 +35,9 @@ export function BottomTabBar({ activeTab, onTabChange }: BottomTabBarProps) {
           if (isCenter) {
             return (
               <TouchableOpacity key="center" style={styles.centerWrapper}>
-                <LiquidGlassView style={styles.centerButton} colorScheme="dark">
+                <GlassButton style={styles.centerButton}>
                   {tab.icon(false)}
-                </LiquidGlassView>
+                </GlassButton>
               </TouchableOpacity>
             );
           }

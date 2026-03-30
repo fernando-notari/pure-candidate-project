@@ -1,5 +1,5 @@
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
-import { LiquidGlassView } from "@callstack/liquid-glass";
+import { GlassButton } from "../glass-button";
 import { LinearGradient } from "expo-linear-gradient";
 import { theme } from "../../theme";
 import { WalletIcon } from "../icons";
@@ -29,12 +29,12 @@ export function HomeHeader({ profilePicture, balance, onBalancePress }: HomeHead
           <Text style={styles.title}>For You</Text>
         </View>
         <Pressable onPress={onBalancePress}>
-          <LiquidGlassView style={styles.balanceButton} colorScheme="dark">
+          <GlassButton style={styles.balanceButton}>
             <View style={{ marginTop: 2 }}>
               <WalletIcon size={22} color={theme.colors.foreground} />
             </View>
             <Text style={styles.balanceText}>{formatBalance(balance)}</Text>
-          </LiquidGlassView>
+          </GlassButton>
         </Pressable>
       </View>
     </View>

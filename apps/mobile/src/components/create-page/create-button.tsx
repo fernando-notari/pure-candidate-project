@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { LiquidGlassView } from "@callstack/liquid-glass";
+import { GlassButton } from "../glass-button";
 import { PlusIcon } from "../icons";
 import { theme } from "../../theme";
 
@@ -12,9 +12,9 @@ export function CreateButton({ onPress }: CreateButtonProps) {
     <View style={styles.container}>
       <Text style={styles.label}>Tap to create</Text>
       <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
-        <LiquidGlassView style={styles.button} colorScheme="dark">
+        <GlassButton style={styles.button}>
           <PlusIcon size={24} color={theme.colors.foreground} />
-        </LiquidGlassView>
+        </GlassButton>
       </TouchableOpacity>
     </View>
   );
